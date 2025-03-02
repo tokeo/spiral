@@ -6,6 +6,8 @@ from .core.exc import SpiralError
 from .controllers.base import BaseController
 from .controllers.emit import EmitController
 from .controllers.grpccall import GrpcCallController
+
+
 class Spiral(App):
     """The Spiral primary application."""
 
