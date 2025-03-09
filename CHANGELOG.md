@@ -1,5 +1,5 @@
 # The Spiral change log history
 
-## 1.0.2
+## 1.0.3
 
 Initial release.
