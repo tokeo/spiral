@@ -5,6 +5,9 @@ export APP_LABEL="spiral"
 # the prompt for login shell
 export PS1="\[\e[0;33m\]\(> $APP_LABEL <\) \[\e[1;35m\]\W\[\e[0m\] \[\e[0m\]# "
 
+# show small feddback
+echo -e "$APP_LABEL is warming up ...\c"
+
 # always start the rabbitmq-server
 /usr/sbin/rabbitmq-server -detached
 
