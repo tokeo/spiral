@@ -21,7 +21,8 @@ RUN apk add --update --no-cache \
     rabbitmq-server \
     && ln -s /usr/share/zoneinfo/UTC /etc/localtime \
     && pip install --upgrade pip \
-    && pip install --no-cache-dir -e .
+    && pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir -e .[dev]
 
 WORKDIR /app
 ENTRYPOINT ["ash", "-l"]

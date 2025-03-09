@@ -11,7 +11,7 @@ alias ll='ls -la'
 /usr/sbin/rabbitmq-server -detached
 
 # always start the spiral nicegui web-service
-(spiral nicegui serve >/dev/null 2>&1 &)
+(spiral nicegui serve --hotload >/dev/null 2>&1 &)
 
 # cleanup
 clear
