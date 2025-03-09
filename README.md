@@ -31,6 +31,9 @@ docker run -p 8080:8080 -it tokeocli/spiral
 
 # Launch the spiral interactive example inside the shell
 launch
+
+# Open local browser to get the spiral dashboard app
+# https://localhost:8080
 ```
 
 <br/>
