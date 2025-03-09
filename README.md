@@ -27,7 +27,7 @@ without the setup overhead.
 
 ```bash
 # Just start the interactive spiral image
-docker run -it tokeocli/spiral
+docker run -p 8080:8080 -it tokeocli/spiral
 
 # Launch the spiral interactive example inside the shell
 launch
