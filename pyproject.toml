@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=64.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spiral"
+dynamic = ["version"]  # Declare version as dynamic
+description = "Spiral is the Tokeo example app!"
+readme = "README.md"
+authors = [
+    {name = "Tom Freudenberg", email = "th.freudenberg@gmail.com"}
+]
+license = {text = "MIT"}
+urls = {"Homepage" = "https://github.com/tokeo/spiral"}
+requires-python = ">=3.10"  # Adjust based on your needs
+dependencies = [
+    "tokeo==1.0.2",
+    "cement==3.0.12",
+    "cement[jinja2]",
+    "jinja2",
+    "cement[yaml]",
+    "PyYAML",
+    "cement[colorlog]",
+    "colorlog",
+    "lazy_loader",
+    "prompt_toolkit",
+    "diskcache",
+    "dramatiq",
+    "dramatiq[rabbitmq]",
+    "pika",
+    "grpcio",
+    "grpcio-tools",
+    "protobuf",
+    "apscheduler>=3.0,<4.0",
+    "requests",
+    "nicegui",
+    "fastapi",
+    "starlette",
+    "pscript",
+    "vbuild",
+    "pocketbase",
+    "invoke",
+    "fabric",
+    "paramiko",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pip-tools",
+    "pytest",
+    "pytest-cov",
+    "coverage",
+    "twine>=1.11.0",
+    "setuptools>=38.6.0",
+    "wheel>=0.31.0",
+    "pyink",
+    "flake8",
+    "pdoc3",
+    "watchdog",
+    "dramatiq[watch]",
+    "watchdog_gevent",
+    "gevent",
+]
+
+[project.scripts]
+spiral = "spiral.main:main"
+
+[tool.setuptools]
+packages = {find = {exclude = ["ez_setup", "tests*"]}}
+include-package-data = true
+
+[tool.setuptools.package-data]
+"spiral" = ["templates/*", "templates/**/*", "templates/**/.*", "*.proto"]
+
+[tool.setuptools.dynamic]
+version = {attr = "spiral.core.version.get_version"}
