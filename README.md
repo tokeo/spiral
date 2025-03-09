@@ -9,6 +9,59 @@
 
 <br/>
 
+## 🚀 Spiral: Experience Tokeo in Action
+
+[Spiral](https://github.com/tokeo/spiral) takes you on an interactive journey through
+[Tokeo's](https://github.com/tokeo/tokeo) capabilities, providing a fully functional environment
+where you can witness Event-Driven Architecture in real-time.
+
+With the pre-configured [Spiral Docker image](https://hub.docker.com/u/tokeocli) that includes an
+activated RabbitMQ server and interactive shell, you can explore working examples of task processing,
+scheduling, and automation while monitoring the entire system through a multi-window interface.
+
+Whether you're evaluating Tokeo for your next project or simply curious about modern Python backend architectures,
+Spiral offers an immersive test flight that demonstrates the power and elegance of event-driven systems
+without the setup overhead.
+
+### Run the full working Spiral example
+
+```bash
+# Just start the interactive spiral image
+docker run -it tokeocli/spiral
+
+# Launch the spiral interactive example inside the shell
+launch
+```
+
+<br/>
+
+Kickstart your EDA projects with **tokeo** and experience a seamless development cycle.
+
+Cheers<br/>
+Tom
+
+<br/>
+
+## 💪 Why Choose Tokeo?
+
+Tokeo is a robust CLI framework for task automation, message queues, and web interfaces, making it ideal for Python backend projects. Key features include:
+
+- **Integrated EDA Stack**: Combines Dramatiq, RabbitMQ, and gRPC for efficient task processing and external access, plus APScheduler for scheduled jobs.
+- **Flexible Task Automation**: Use Fabric-based tools (`tokeo.ext.automate`) to define and run local or remote tasks, with flexible configuration via YAML and CLI overrides.
+- **Extensible CLI**: Built on Cement, Tokeo supports custom commands and plugins, simplifying complex workflows with minimal setup.
+- **Developer-Friendly Tools**: The `Makefile` provides one-liners for formatting (`fmt`), linting (`lint`), testing (`test`), and packaging (`sdist`, `wheel`), speeding up development.
+- **DiskCache** by `tokeo.ext.diskcache` enhances performance with disk-based caching for frequently accessed data, reducing load times and improving efficiency.
+- **Manage task execution rates** using `temper` and `throttle` to prevent overloading with rate-limiting tools, ensuring stable and controlled processing.
+- **SMTP with Jinja2 Templates**: Send emails with precise, individualized content using Jinja2 templates, supporting text, HTML, inline images, and attachments for dynamic communications.
+- **Simple debugging** when using `app.inspect`. Provides basic debugging tools to inspect application state of vars and objects.
+- **Web Interface**: Create beautiful UIs with the built-in NiceGUI extension to visualize data and interact with your application.
+
+Whether you're building microservices, automating workflows, or prototyping, Tokeo provides the structure and flexibility to get started quickly.
+
+<br/>
+<br/>
+<br/>
+
 ## 🚀 Welcome to Your New Journey
 
 Congratulations on creating your **Spiral** project! This is more than just code – it's the foundation for bringing your ideas to life. Whether you're building a data analysis tool, a web service, or an AI-powered application, you've taken the first step toward creating something meaningful.
@@ -241,6 +294,4 @@ If you encounter challenges or have questions:
 <br/>
 <br/>
 
-<p>
-  Built with ❤️ and <a href="https://github.com/tokeo/tokeo">tokeo</a> - Empowering Python Applications
-</p>
+Built with ❤️ and <a href="https://github.com/tokeo/tokeo">tokeo</a> - Empowering Python Applications
