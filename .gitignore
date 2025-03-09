@@ -17,6 +17,9 @@
 # -> !/path/subdirectory/
 #
 
+!/.alpine/
+!/.alpine/**
+
 !/config/
 !/config/**
 /config/**/*.local.*
