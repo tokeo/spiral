@@ -49,7 +49,6 @@ proto:
 doc:
 	rm -rf html
 	pdoc3 --html spiral tests
-	open http://localhost:9999
 	pdoc3 --html --http localhost:9999 spiral tests
 
 # check for verbosity
@@ -110,6 +109,9 @@ lint:
 	flake8 --max-line-length 140 --max-doc-length 84 --extend-ignore "" --exclude "*/grpc/proto/*_pb2*.py,.git,__pycache__" $(sources)
 
 docker: clean
+	@echo "Build docker image ..."
+	@echo "  using current .gitignore as .dockerignore"
+	cp .gitignore .dockerignore
 	docker build -t tokeocli/spiral:latest .
 
 sdist: clean
