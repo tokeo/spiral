@@ -1,0 +1,26 @@
+# spiral ramp up
+export SPIRAL_ENV="prod"
+export APP_LABEL="spiral"
+
+# the prompt for login shell
+export PS1="\[\e[0;33m\]\(> $APP_LABEL <\) \[\e[1;35m\]\W\[\e[0m\] \[\e[0m\]# "
+
+# always start the rabbitmq-server
+/usr/sbin/rabbitmq-server -detached
+
+# always start the spiral nicegui web-service
+($APP_LABEL nicegui serve --hotload >/dev/null 2>&1 &)
+
+# cleanup
+clear
+
+# show prompt
+$APP_LABEL --version
+echo ""
+echo ""
+echo "Enter 'launch' to start the $APP_LABEL multi-window example."
+echo ""
+echo "  -- if dramatiq window shows few times an '404' error,"
+echo "     it is expected while the default queues need to setup"
+echo ""
+echo ""

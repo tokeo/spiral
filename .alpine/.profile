@@ -1,28 +1,14 @@
-# spiral profile
+# image profile
 
-# repeat the prompt for login shell
-export PS1="\[\e[0;33m\]\(> spiral <\) \[\e[1;35m\]\W\[\e[0m\] \[\e[0m\]# "
+# check if app has an overruled .docker dir
+if [ -d "/app/.docker" ]
+then
+  # copy into $HOME
+  cp -r /app/.docker/.* $HOME >/dev/null 2>&1
+  cp -r /app/.docker/* $HOME >/dev/null 2>&1
+fi
 
-# define dome aliases
-alias launch='screen'
-alias ll='ls -la'
-
-# always start the rabbitmq-server
-/usr/sbin/rabbitmq-server -detached
-
-# always start the spiral nicegui web-service
-(spiral nicegui serve --hotload >/dev/null 2>&1 &)
-
-# cleanup
-clear
-
-# show prompt
-spiral --version
-echo ""
-echo ""
-echo "Enter 'launch' to start the Spiral multi-window example."
-echo ""
-echo "  -- if dramatiq window shows two times an '404' error,"
-echo "     it is expected while the default queues need to setup"
-echo ""
-echo ""
+if [ -f "$HOME/.launchrc" ]
+then
+  source $HOME/.launchrc
+fi

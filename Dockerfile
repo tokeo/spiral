@@ -6,7 +6,6 @@ ENV SPIRAL_ENV=prod
 WORKDIR /app
 COPY . /app
 COPY .alpine/.profile /root
-COPY .alpine/.screenrc /root
 
 RUN apk add --update --no-cache \
     tzdata \

@@ -19,6 +19,8 @@
 
 !/.alpine/
 !/.alpine/**
+!/.docker/
+!/.docker/**
 
 !/config/
 !/config/**
