@@ -140,7 +140,6 @@ lint:
 docker: clean
 	@echo "Build docker image ..."
 	@echo "  using current .gitignore as .dockerignore"
-	cp .gitignore .dockerignore
 	docker build -t tokeocli/spiral:latest .
 
 sdist: clean

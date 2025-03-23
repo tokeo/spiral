@@ -24,6 +24,7 @@
 
 !/config/
 !/config/**
+/config/**/*.local.*
 
 !/docs/
 !/docs/**
@@ -45,7 +46,6 @@
 !/.gitignore
 !/.npmrc
 !/Dockerfile
-!/.dockerignore
 !/Makefile
 
 !/package.json
