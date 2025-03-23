@@ -1,4 +1,4 @@
-Copyright ©2025 tokeo project
+Copyright ©2025 Tokeo project
 Author Tom Freudenberg <th.freudenberg@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

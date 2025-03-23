@@ -4,7 +4,7 @@ from tokeo.ext.argparse import Controller
 from tokeo.core.version import get_version as tokeo_get_version
 from ..core.version import get_version
 
-DESCRIPTION = """Spiral is the Tokeo example app!"""
+DESCRIPTION = """Spiral is easily crafted with Tokeo and is the example app!"""
 CEMENT_VERSION, PYTHON_VERSION, OS_VERSION = (cement_version_banner().split('\n') + ['unknown', 'unknown', 'unknown'])[:3]
 VERSION_BANNER = f"""
  

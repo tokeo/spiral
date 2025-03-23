@@ -39,7 +39,7 @@ def footer():
     """
     with layout.footer(
         footer_info='Spiral',
-        footer_copyright='©2025 tokeo project',
+        footer_copyright='©2025 Tokeo project',
     ):
         with ux.div().classes('flex-grow flex flex-col'):
             ux.a('Products').classes('py-1 text-xs tracking-wider').props('href="#"')

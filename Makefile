@@ -1,8 +1,30 @@
-.PHONY: clean venv outdated devenv proto test fmt docker sdist wheel dist-upload
+.PHONY: help clean venv outdated dev prod proto doc test fmt lint docker sdist wheel dist-upload
+
+help:
+	@echo
+	@echo
+	@echo "___________________________________________________"
+	@echo
+	@echo "Use make with proper rule:"
+	@echo
+	@echo "  clean - remove all cache files and temps"
+	@echo "  venv - create venv"
+	@echo "  outdated - check outdated packages"
+	@echo "  dev - install dev components"
+	@echo "  prod - install prod components"
+	@echo "  doc - create and (serve) documentation"
+	@echo "  test (debug=1) files=tests/file - run tests"
+	@echo "  fmt (source=module) = run formatter"
+	@echo "  lint (source=module) = run linter"
+	@echo "  docker - create docker image"
+	@echo "  sdist - create source tgz"
+	@echo "  wheel - create installation wheel"
+	@echo
 
 clean:
 	find . -name '*.py[co]' -delete
 	find . -type d -name '__pycache__' -delete
+	find . -type d -name '__pycache__' | sort --reverse | xargs rm -rfv
 	rm -rf .pytest_cache .coverage coverage-report
 	rm -rf html
 	rm -rf tmp
@@ -48,12 +70,12 @@ prod:
 	pip install -e .
 
 proto:
+	@if [ "0${VIRTUAL_ENV}"${no_venv} == "0" ]; then echo "No venv activated! Add no_venv=1 to enforce make."; exit 1; fi
 	python -m grpc_tools.protoc -I./ --python_out=. --pyi_out=. --grpc_python_out=. ./spiral/core/grpc/proto/spiral.proto
 
 doc:
-	rm -rf html
-	pdoc3 --html spiral tests
-	pdoc3 --html --http localhost:9999 spiral tests
+	@if [ "0${VIRTUAL_ENV}"${no_venv} == "0" ]; then echo "No venv activated! Add no_venv=1 to enforce make."; exit 1; fi
+	spiral pdoc render --clean --serve
 
 # check for verbosity
 ifdef verbose
@@ -86,6 +108,7 @@ endif
 # limit the tests to run by files and tests filters
 # make test files=test_logging.py tests=logging debug=1
 test:
+	@if [ "0${VIRTUAL_ENV}"${no_venv} == "0" ]; then echo "No venv activated! Add no_venv=1 to enforce make."; exit 1; fi
 	rm -rf tmp/tests
 	mkdir -p tmp/tests
 	touch tmp/tests/.gitkeep
@@ -105,10 +128,12 @@ sources=spiral docs tests
 endif
 
 fmt:
+	@if [ "0${VIRTUAL_ENV}"${no_venv} == "0" ]; then echo "No venv activated! Add no_venv=1 to enforce make."; exit 1; fi
 	# align with https://google.github.io/styleguide/pyguide.html
 	pyink --pyink-use-majority-quotes --line-length 139 --include "\.py" --exclude="/(\.git|__pycache__)/" $(sources)
 
 lint:
+	@if [ "0${VIRTUAL_ENV}"${no_venv} == "0" ]; then echo "No venv activated! Add no_venv=1 to enforce make."; exit 1; fi
 	# align with https://google.github.io/styleguide/pyguide.html
 	flake8 --max-line-length 140 --max-doc-length 84 --extend-ignore "" --exclude "*/grpc/proto/*_pb2*.py,.git,__pycache__" $(sources)
 

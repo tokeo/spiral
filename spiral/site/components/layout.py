@@ -134,7 +134,7 @@ def nav():
 
 
 @contextmanager
-def footer(footer_info=None, footer_copyright='©2025 tokeo project'):
+def footer(footer_info=None, footer_copyright='©2025 Tokeo project'):
     # sticky footer
     with ux.footer().classes(f'{COLORS["footer_bg"]} mt-auto'):
         with ux.div().classes(f'px-4 py-3 {COLORS["footer"]} mx-auto'):

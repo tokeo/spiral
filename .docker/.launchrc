@@ -1,5 +1,6 @@
-# spiral ramp up
-export SPIRAL_ENV="prod"
+# this is a ramp up script to use tokeocli/spiral:latest as
+# ready to test docker image for your tokeo application
+export SPIRAL_ENV="dev"
 export APP_LABEL="spiral"
 
 # the prompt for login shell
@@ -10,6 +11,19 @@ echo -e "$APP_LABEL is warming up ...\c"
 
 # always start the rabbitmq-server
 /usr/sbin/rabbitmq-server -detached
+
+# remove the spiral package and replace with local /app
+(
+cd /app
+sleep .5
+pip uninstall -y spiral
+sleep .5
+make dev no_venv=1
+sleep .5
+make proto
+sleep .5
+$APP_LABEL
+) >/dev/null 2>&1
 
 # always start the spiral nicegui web-service
 ($APP_LABEL nicegui serve --hotload >/dev/null 2>&1 &)

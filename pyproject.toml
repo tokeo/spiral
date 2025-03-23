@@ -5,16 +5,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "spiral"
 dynamic = ["version"]  # Declare version as dynamic
-description = "Spiral is the Tokeo example app!"
+description = "Spiral is easily crafted with Tokeo and is the example app!"
 readme = "README.md"
 authors = [
     {name = "Tom Freudenberg", email = "th.freudenberg@gmail.com"}
 ]
-license = {text = "MIT"}
-urls = {"Homepage" = "https://github.com/tokeo/spiral"}
+license = "MIT"
+urls = {"Homepage" = "https://github.com/tokeo/spiral/"}
 requires-python = ">=3.10"  # Adjust based on your needs
 dependencies = [
-    "tokeo==1.0.5",
+    "tokeo==1.1.0",
     "cement==3.0.12",
     "cement[jinja2]",
     "jinja2",

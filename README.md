@@ -1,7 +1,7 @@
 <h1 align="center">Spiral</h1>
 
 <p align="center">
-  <strong>Spiral is the Tokeo example app!</strong>
+  <strong>Spiral is easily crafted with Tokeo and is the example app!</strong>
 </p>
 <p align="center">
   Created with 💪 by Tom Freudenberg

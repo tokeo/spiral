@@ -1,5 +1,5 @@
-### The Spiral Development Configuration Settings
-### Settings will be merged into Application Configuration
+### <p><strong>The Spiral Development Configuration Settings</strong></p>
+### - Settings will be merged into Application Configuration.
 ---
 
 #####################################
@@ -11,3 +11,9 @@ scheduler:
     count_words_timer:
       ### one or multiple entries in crontab style when to run the task
       crontab: '* * * * *'
+
+#####################################
+
+nicegui:
+  ### serve the web service on all interfaces
+  host: '0.0.0.0'
