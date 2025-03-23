@@ -27,13 +27,16 @@ without the setup overhead.
 
 ```bash
 # Just start the interactive spiral image
-docker run -p 8080:8080 -it tokeocli/spiral
+docker run -p 8080:8080 -p 9999:9999 -p 50051:50051 -it tokeocli/spiral
 
 # Launch the spiral interactive example inside the shell
 launch
 
 # Open local browser to get the spiral dashboard app
 # https://localhost:8080
+
+# Open local browser to get the spiral doc app
+# https://localhost:9999
 ```
 
 <br/>
@@ -142,6 +145,8 @@ spiral emit count-words --url https://github.com
 spiral grpc serve
 
 # Execute a task using the gRPC client
+# Reminder: It can be used directly when running
+# via docker image from local instance shell
 spiral grpc-client count-words --url https://github.com
 ```
 
