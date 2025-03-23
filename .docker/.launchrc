@@ -28,6 +28,9 @@ $APP_LABEL
 # always start the spiral nicegui web-service
 ($APP_LABEL nicegui serve --hotload >/dev/null 2>&1 &)
 
+# always start the doc web-service
+($APP_LABEL pdoc render --clean --serve >/dev/null 2>&1 &)
+
 # cleanup
 clear
 
