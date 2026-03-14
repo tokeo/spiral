@@ -22,7 +22,7 @@ Define automation functions with the standard interface pattern:
 ```python
 from tokeo.ext.appshare import app
 
-def process_report(app, connection, verbose=False, report_type='summary'):
+def process_report(runner, verbose=False, report_type='summary', **kwargs):
     '''
     Generate a business report on the target system.
 
@@ -31,14 +31,14 @@ def process_report(app, connection, verbose=False, report_type='summary'):
 
     ### Args:
 
-    - **app** (Application): Application context with configuration
-        and logging
-    - **connection** (Connection): SSH or local shell connection
+    - **runner** (from invoke): SSH or local shell connection
         to execute commands
     - **verbose** (bool, optional): Whether to show command output.
         Defaults to False.
     - **report_type** (str, optional): Type of report to generate.
         Defaults to 'summary'.
+    - **kwargs** (dict, kwargs): Additional arguments for task and runner.
+        Standards are 'pty', 'env', 'encoding', 'timeout' and others.
 
     ### Returns:
 
@@ -46,7 +46,7 @@ def process_report(app, connection, verbose=False, report_type='summary'):
 
     '''
     app.log.info(f'Generating {report_type} report')
-    result = connection.run(
+    result = runner(
         f'generate-report --type {report_type}',
         hide=not verbose,
         warn=False,
@@ -75,18 +75,19 @@ myapp automate run process_report
 
 ### Notes:
 
-- All automation functions must accept the app and connection parameters
-- Connection provides run() for executing commands on the target system
+- All automation functions must accept the runner parameter
+- runner() provides executing commands on the target system
 - Use the verbose parameter to control command output visibility
 - For long-running tasks, consider delegating to dramatiq actors
 - Return values are typically command execution results
 
 """
 
+from tokeo.ext.appshare import app
 from spiral.core import tasks
 
 
-def count_words(app, connection, verbose=False):
+def count_words(runner, verbose=False, **kwargs):
     """
     Count words on a web page after gathering system information.
 
@@ -96,12 +97,12 @@ def count_words(app, connection, verbose=False):
 
     ### Args:
 
-    - **app** (Application): Application context with configuration
-        and logging
-    - **connection** (Connection): SSH or local shell connection to
-        execute commands
+    - **runner** (from invoke): SSH or local shell connection
+        to execute commands
     - **verbose** (bool, optional): Whether to show command output.
         Defaults to False.
+    - **kwargs** (dict, kwargs): Additional arguments for task and runner.
+        Standards are 'pty', 'env', 'encoding', 'timeout' and others.
 
     ### Returns:
 
@@ -109,14 +110,14 @@ def count_words(app, connection, verbose=False):
 
     """
     app.log.info('Automation count_words called')
-    result = connection.run('uname -mrs', hide=not verbose, warn=False)
+    result = runner('uname -mrs', hide=not verbose, warn=False)
     url = f'https://google.com/q="{result.stdout}"'.replace('\n', '').replace('\r', '')
     app.log.info(f'Run actor from automation with url: {url}')
     tasks.actors.count_words.send(url)
     return True
 
 
-def uname(app, connection, verbose=False, flags=None):
+def uname(runner, verbose=False, flags=None, **kwargs):
     """
     Execute the uname command on a target system with specified flags.
 
@@ -125,14 +126,14 @@ def uname(app, connection, verbose=False, flags=None):
 
     ### Args:
 
-    - **app** (Application): Application context with configuration
-        and logging
-    - **connection** (Connection): SSH or local shell connection to
-        execute commands
+    - **runner** (from invoke): SSH or local shell connection
+        to execute commands
     - **verbose** (bool, optional): Whether to show command output.
         Defaults to False.
     - **flags** (list, optional): List of flags to pass to
         the uname command
+    - **kwargs** (dict, kwargs): Additional arguments for task and runner.
+        Standards are 'pty', 'env', 'encoding', 'timeout' and others.
 
     ### Returns:
 
@@ -140,4 +141,4 @@ def uname(app, connection, verbose=False, flags=None):
 
     """
     app.log.info('Automation uname called')
-    return connection.run(f'uname {" ".join(flags)}', hide=not verbose, warn=False)
+    return runner(f'uname {" ".join(flags)}', hide=not verbose, warn=False)

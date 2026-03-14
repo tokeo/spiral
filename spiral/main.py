@@ -8,6 +8,7 @@ extensible CLI application with support for various extensions and handlers.
 """
 
 import os
+import tokeo.core.utils.strict  # noqa: F401
 from cement import App, TestApp
 from cement.utils import fs
 from cement.core.exc import CaughtSignal

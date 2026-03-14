@@ -24,6 +24,7 @@
 
 !/config/
 !/config/**
+/config/**/*.local.*
 
 !/docs/
 !/docs/**
@@ -60,6 +61,7 @@
 !/LICENSE.md
 !/README.md
 !/TODO.md
+!/*.md
 
 #
 # ATTENTION:
@@ -179,5 +181,9 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypy
+# caches
+spiral_diskcache
 .mypy_cache/
+
+# Others stuff
+node_modules/

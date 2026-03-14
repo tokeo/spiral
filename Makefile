@@ -16,6 +16,7 @@ help:
 	@echo "  test (debug=1) files=tests/file - run tests"
 	@echo "  fmt (source=module) = run formatter"
 	@echo "  lint (source=module) = run linter"
+	@echo "  proto - create grpc proto files"
 	@echo "  docker - create docker image"
 	@echo "  sdist - create source tgz"
 	@echo "  wheel - create installation wheel"
@@ -140,6 +141,7 @@ lint:
 docker: clean
 	@echo "Build docker image ..."
 	@echo "  using current .gitignore as .dockerignore"
+	cp .gitignore .dockerignore
 	docker build -t tokeocli/spiral:latest .
 
 sdist: clean

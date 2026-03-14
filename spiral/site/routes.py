@@ -1,127 +1,101 @@
 """
-Web page routes and UI definitions for the application's website.
+Web page routes and API endpoint mapping for the application.
 
-This module provides a centralized location for defining website routes and
-page handlers in Tokeo and Cement applications using NiceGUI. It contains
-the default (index) route and additional page routes that make up the website's
-navigation structure, leveraging the components.blocks and components.layout
-modules for consistent page structure and design.
+This module acts as the central registry for all web pages and API endpoints.
+It imports isolated page and API functions and binds them to specific URL
+paths using NiceGUI and FastAPI's programmatic routers.
 
-### Features:
-
-- **Default route** (`/`) serving as the application's homepage
-- **Page definitions** with consistent layout and navigation
-- **Route handlers** for different application URL paths
-- **UI component organization** using a modular component approach
-- **Responsive design** that works across different device types
+**CRITICAL (NiceGUI 3.x Architecture):** Absolutely no UI elements (`ui.label`,
+`ui.button`, etc.) may be instantiated in the global scope of this file.
+All UI construction must happen strictly inside the registered page functions
+to prevent memory leaks and cross-session state contamination.
 
 ### Route Structure:
 
-Routes are defined either as simple functions (for the default route) or as
-decorated functions using `@ui.page('/path')` for specific paths. Each route
-handler typically uses the shared layout components to maintain design
-consistency while implementing page-specific content.
+Routes are defined as pure, stateless functions in the `pages/` and `apis/`
+directories, and are mapped to URL paths in this file via dictionaries or
+direct programmatic calls.
 
 ### Usage:
 
-Define a new page route by adding a function with the `@ui.page` decorator:
+To add a new page or API endpoint to your application:
+
+1. Create a pure function in `site/pages/` or `site/apis/`.
+2. Import it into this module.
+3. Add it to the `pages` mapping dictionary or API registry.
+
+### Example of adding a new page dynamically:
 
 ```python
-from tokeo.ext.appshare import app
-from .components import blocks
+from .pages import page_catalog
 
-ui = app.nicegui.ui
-ux = app.nicegui.ux
+def pages_map():
+    pages = {
+        '/': page_root,
+        '/catalog': page_catalog,  # Newly mapped route
+    }
 
-@ui.page('/products')
-def products_page():
-    '''Products catalog page showing available items.'''
-    with blocks.page(title='Product Catalog'):
-        # Page-specific content
-        with ui.card().classes('w-full'):
-            ui.label('Product Listings').classes('text-xl font-bold')
-
-            # Product grid
-            with ui.grid(columns=3).classes('gap-4 mt-4'):
-                for i in range(6):
-                    with ui.card():
-                        ui.label(f'Product {i+1}').classes('text-lg font-semibold')
-                        ui.label('$99.99').classes('text-blue-500')
-                        ui.button(
-                            'Add to Cart',
-                            on_click=lambda: ui.notify('Added to cart'),
-                        )
+    for path, method in pages.items():
+        ui.page(path, title=f'Tokeo - {path[2:]}')(method)
 ```
-
-The routes module works with the blocks and layout modules to create a
-consistent page structure while allowing page-specific content:
-
-- **blocks.page()**: Provides the standard page container with title, navigation,
-    and footer
-- **layout module**: Lower-level components that define the overall page structure
-- **ux element helper**: Provides access to HTML elements not directly exposed
-    by NiceGUI
 
 ### Notes:
 
-- The default route function (named 'default') is automatically registered as the
-    index ('/')
-- Routes are configured in the application's YAML configuration under nicegui.routes
-- The layout and blocks modules abstract away page structure for consistent design
-- Use Tailwind CSS classes for styling consistency and responsive design
-- Each route handler should focus on its specific page content
+- `ui.page()` and `fastapi_app.get()` are used as programmatic wrappers in a loop,
+  not as decorators
+- The `routes()` function is invoked by the `TokeoNicegui` engine during startup
 
 """
 
 from tokeo.ext.appshare import app
-from .components import blocks
+from .apis import api_example
+from .pages import page_root, page_hello_world
 
 
 ui = app.nicegui.ui
-ux = app.nicegui.ux
+fa = app.nicegui.fastapi_app
 
 
-def default():
+def apis_map():
     """
-    Default route handler for the application homepage.
+    Programmatically register all FastAPI REST endpoints.
 
-    This function defines the content of the website's landing page (index route).
-    It uses the standard page layout from the blocks module and adds
-    homepage-specific content.
-
-    ### Notes:
-
-    - Automatically registered as the '/' route in the application
-    - Configured via the 'default_route' setting in nicegui config
-    - Creates a dashboard view with introductory content
+    As an example implementation it maps URL paths programmatically directly.
+    The API functions are isolated, by serving raw JSON and data via FastAPI.
 
     """
-    with blocks.page(title='This is the Spiral dashboard'):
-        ux.p(
-            """
-            This single-page "app" style layout features a sidebar, main content area, and footer.
-            This full-height layout is never more than viewport height. The content area scrolls
-            independently as needed. For this example, we're using the Tailwind CSS utility framework.
-            As part of it's default classes, Tailwind includes Flexbox classes which make this layout
-            implementation simple!
-            """
-        ).classes('text-lg')
+    # Set direct routes mapping URL paths to the actual api functions
+    fa.get('/_/api/example')(api_example)
 
 
-@ui.page('/hello-world')
-def hello_function():
+def pages_map():
     """
-    Example route showing a simple page with custom content.
+    Programmatically register all NiceGUI web pages.
 
-    This function demonstrates how to create additional pages beyond
-    the default route, using the @ui.page decorator to specify the URL path.
-
-    ### Notes:
-
-    - Accessible at the '/hello-world' URL path
-    - Uses the standard page layout for consistency
-    - Demonstrates adding custom styled content to a page
+    As an example implementation it iterates through a dictionary of
+    routes and binds them to their respective UI generation functions.
+    Additional it injects dynamic parameters like page titles.
 
     """
-    with blocks.page(title='Customers administration'):
-        ui.label('Hello world!').classes('text-2xl text-orange-500')
+    # A dictionary mapping URL paths to the actual UI generation functions
+    pages = {
+        '/': page_root,
+        '/hello-world': page_hello_world,
+    }
+
+    # register all of them in a loop
+    for path, method in pages.items():
+        # pass additional arguments like dark mode or title here!
+        ui.page(path, title=f'Tokeo - {path[2:]}')(method)
+
+
+def routes():
+    """
+    Activate the routes for APIs and pages.
+
+    This function is called by the application orchestrator during startup
+    to finalize the routing map before the web server binds to the port.
+
+    """
+    apis_map()
+    pages_map()
