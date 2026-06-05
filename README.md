@@ -262,7 +262,7 @@ Your project is organized into a clean, modular structure:
 - `spiral/controllers/` - Command-line interface controllers
 - `spiral/core/logic` - Space for your core application logic
 - `spiral/core/grpc/` - gRPC service definitions and implementations
-- `spiral/core/pages/` - Web interface pages and apis
+- `spiral/site/` - Web interface pages and apis
 - `spiral/core/tasks/` - Implementations of actors, agents, automations, operations, performers etc.
 - `spiral/core/utils/` - A place to put your overall tools and helper functions
 - `spiral/templates/` - Templates for rendering content

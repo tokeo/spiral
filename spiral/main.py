@@ -12,6 +12,7 @@ import tokeo.core.utils.strict  # noqa: F401
 from cement import App, TestApp
 from cement.utils import fs
 from cement.core.exc import CaughtSignal
+from tokeo.core.exc import TokeoError
 from .core.exc import SpiralError
 from .controllers.base import BaseController
 from .controllers.emit import EmitController
@@ -27,7 +28,7 @@ class Spiral(App):
     Cement framework for command-line parsing, configuration management,
     logging, and more.
 
-    ### Notes:
+    ### Notes
 
     - The application includes several extensions by default:
         colorlog, generate, pdoc, print, jinja2, yaml and others
@@ -61,6 +62,7 @@ class Spiral(App):
             'tokeo.ext.jinja2',
             'tokeo.ext.appshare',
             'tokeo.ext.smtp',
+            'tokeo.ext.vault',
             'tokeo.ext.diskcache',
             'tokeo.ext.dramatiq',
             'tokeo.ext.grpc',
@@ -68,6 +70,7 @@ class Spiral(App):
             'tokeo.ext.nicegui',
             'tokeo.ext.pocketbase',
             'tokeo.ext.automate',
+            'tokeo.ext.ai',
         ]
 
         # register handlers
@@ -93,11 +96,11 @@ class SpiralTest(TestApp, Spiral):
     for Spiral applications. It modifies various settings to be more
     suitable for automated testing.
 
-    ### Usage:
+    ### Usage
 
     ```python
     # Basic test setup
-    from .main import SpiralTest
+    from spiral.main import SpiralTest
 
     with SpiralTest() as app:
         app.run()
@@ -105,7 +108,7 @@ class SpiralTest(TestApp, Spiral):
 
     ```
 
-    ### Notes:
+    ### Notes
 
     - Uses standard logging instead of colorlog for cleaner test output
     - Includes a smaller set of extensions to reduce test complexity
@@ -127,13 +130,13 @@ def dramatiq():
     It sets up the necessary environment without running the full
     CLI application stack.
 
-    ### Used by Spiral CLI for the dramatiq workers:
+    ### Used by Spiral CLI for the dramatiq workers
 
     ```bash
     spiral dramatiq serve
     ```
 
-    ### Notes:
+    ### Notes
 
     - Initializes the application without command processing
     - Disables signal handling as Dramatiq manages its own signals
@@ -159,11 +162,11 @@ def main():
     the primary entry point when running Spiral as
     a command-line application.
 
-    ### Returns:
+    ### Returns
 
     - **int**: Exit code indicating success (0) or failure (non-zero)
 
-    ### Raises:
+    ### Raises
 
     - **AssertionError**: When an assertion fails during application execution
     - **SpiralError**: When a Spiral-specific
@@ -184,8 +187,13 @@ def main():
 
                 traceback.print_exc()
 
-        except SpiralError as e:
-            print(f'SpiralError > {e.args[0]}')
+        except (TokeoError, SpiralError) as e:
+            if app and app.log and app.log.error:
+                app.log.error(type(e).__name__)
+                app.log.error(e.args[0] if e.args else str(e))
+            else:
+                print(type(e).__name__)
+                print(e.args[0] if e.args else str(e))
             app.exit_code = 1
 
             if app.debug is True:
