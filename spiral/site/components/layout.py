@@ -192,7 +192,7 @@ def nav():
 
 
 @contextmanager
-def footer(footer_info=None, footer_copyright='©2025 Tokeo project'):
+def footer(footer_info=None, footer_copyright='©2026 Tokeo project'):
     # ensure multi-user safety
     guard_user_context()
 
