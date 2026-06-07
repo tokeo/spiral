@@ -1,7 +1,7 @@
 """
 Real test cases for the Spiral ai setup.
 
-Verifies the project's own tools, the guarded ``mock`` agent, and the guard
+Verifies the project's own tools, the ``guarded`` agent, and the guard
 pipeline against the real shipped configuration (the testing environment
 merges ``testing.d/ai.yaml`` over ``base.d/ai.yaml``, pointing the file tools
 below ``tmp/tests``). Run from the project root, for example with
@@ -70,16 +70,16 @@ def test_spiral_ai_tools_exec(scratch):
             app.ai._tool('read_file').exec(path='missing.txt')
 
 
-def test_spiral_ai_agent_mock_runs_tools(scratch):
+def test_spiral_ai_agent_guarded_runs_tools(scratch):
     # the guarded agent answers through the loop: calculate, tell the time,
     # and read a file -- driven by the built-in mock model
     with SpiralAiTestApp() as app:
-        assert app.ai.ask('calc 2 + 3', agent='mock') == 'Done. The tool returned: 5'
-        assert app.ai.ask('current', agent='mock').startswith('Done. The tool returned: 2')
-        assert app.ai.ask('read_file sample.txt', agent='mock') == 'Done. The tool returned: buy milk\n'
+        assert app.ai.ask('calc 2 + 3', agent='guarded', profile='mock') == 'Done. The tool returned: 5'
+        assert app.ai.ask('current', agent='guarded', profile='mock').startswith('Done. The tool returned: 2')
+        assert app.ai.ask('read_file sample.txt', agent='guarded', profile='mock') == 'Done. The tool returned: buy milk\n'
 
 
-def test_spiral_ai_agent_mock_denies_writing(scratch):
+def test_spiral_ai_agent_guarded_denies_writing(scratch):
     # the readonly policy denies the writing tool by name: the call never
     # runs, the loop continues, and the audit guard records the denial
     logs = []
@@ -88,7 +88,7 @@ def test_spiral_ai_agent_mock_denies_writing(scratch):
     with SpiralAiTestApp() as app:
         app.log.backend.addHandler(handler)
         app.log.backend.setLevel(logging.INFO)
-        result = app.ai.chat([{'role': 'user', 'content': 'append_file hello'}], agent='mock')
+        result = app.ai.chat([{'role': 'user', 'content': 'append_file hello'}], agent='guarded', profile='mock')
         assert "denied: tool 'append_file' is not permitted by policy" in result.text
         assert len(result.trace) == 1
         assert result.trace[0].decision == 'deny'

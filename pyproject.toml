@@ -42,6 +42,9 @@ dependencies = [
     "pocketbase",
     "invoke>=2.1.4",
     "paramiko>=2.7,<4",
+    "numpy",
+    "numba",
+    "torch",
 ]
 
 [project.optional-dependencies]
