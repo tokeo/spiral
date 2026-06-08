@@ -29,6 +29,25 @@ class SpiralAiTestApp(SpiralTest):
         ]
 
 
+def test_spiral_fundi_lexicon_loads():
+    # the editable language definition (FUNDI-LEX.yaml) must parse and
+    # validate cleanly: every section filled for both languages, tools
+    # known to the grammar, required placeholders present -- this runs
+    # without weights and catches lexicon edits before a training run
+    from spiral.core.fundi.data import _LEXICON
+    from spiral.core.fundi.dsl import DOMAIN
+    for language in ('en', 'de'):
+        assert _LEXICON['time_words'][language]
+        assert _LEXICON['relative_words'][language]
+        assert _LEXICON['units'][language]
+        for group in ('single', 'shift', 'shift_minus', 'relative', 'relative_chain'):
+            pool = _LEXICON['patterns'][group]
+            assert (pool[language] if language in pool else all(pool[tool][language] for tool in pool))
+    assert _LEXICON['negatives'] and _LEXICON['preambles'] and _LEXICON['leadins']
+    for tool in _LEXICON['consumers']:
+        assert tool in DOMAIN
+
+
 @pytest.mark.skipif(
     not Path('spiral/core/fundi/weights.npz').exists(),
     reason="fundi has no trained weights yet (run 'python -m spiral.core.fundi.train')",
@@ -37,11 +56,25 @@ def test_spiral_ai_fundi_model():
     # the project's own trained micro language model (spiral/core/fundi)
     # plans with learned weights: exact copies, real chains incl. the
     # today-bridge, honest nomatch -- and the guards still rule the loop
-    from datetime import date
+    from datetime import date, timedelta
     with SpiralAiTestApp() as app:
         assert app.ai.ask('weekday of 2026-12-24', agent='guarded', profile='fundi') == '[fundi] weekday: Thursday'
         assert app.ai.ask('weekday of 2026-12-24 minus 2 days', agent='guarded', profile='fundi') == '[fundi] weekday: Tuesday'
+        assert app.ai.ask('add 2 months to 2026-06-08', agent='guarded', profile='fundi') == '[fundi] add_months: 2026-08-08'
+        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        assert app.ai.ask('welches datum ist morgen', agent='guarded', profile='fundi') == f'[fundi] add_days: {tomorrow}'
         assert app.ai.ask('die mondphase am 2000-01-06', agent='guarded', profile='fundi') == '[fundi] moon_phase: new moon'
+        # a relative chain: two shifts from today, day word then year word
+        base = date.today() + timedelta(days=1)
+        try:
+            target = base.replace(year=base.year + 1)
+        except ValueError:
+            # feb 29 clamps to feb 28 in a common year, like the tool does
+            target = base.replace(year=base.year + 1, day=28)
+        chain2 = app.ai.ask('the date of tomorrow next year', agent='guarded', profile='fundi')
+        assert chain2 == f'[fundi] add_years: {target.isoformat()}'
+        # a hard negative: calendar-near wording the model cannot serve
+        assert app.ai.ask('what date is my birthday', agent='guarded', profile='fundi') == '[fundi] what date is my birthday'
         assert app.ai.ask('sing me a song', agent='guarded', profile='fundi') == '[fundi] sing me a song'
         days = (date(2026, 12, 24) - date.today()).days
         chained = app.ai.chat([{'role': 'user', 'content': 'count the days from today until 2026-12-24'}], agent='guarded', profile='fundi')
