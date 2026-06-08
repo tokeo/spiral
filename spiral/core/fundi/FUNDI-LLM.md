@@ -48,6 +48,10 @@ signed offsets. Small, but real tasks:
     spiral ai ask "the date of tomorrow next year" --profile fundi
     spiral ai ask "heute plus 1 jahr" --profile fundi
 
+    # the current date itself: a bare time word is enough
+    spiral ai ask "today" --profile fundi
+    spiral ai ask "heute" --profile fundi
+
     # and the three-step chains, its signature move
     spiral ai ask "the weekday of today plus 14 days" --profile fundi
     spiral ai ask "der wochentag von vor 2 tagen" --profile fundi
