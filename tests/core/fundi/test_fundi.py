@@ -46,6 +46,13 @@ def test_spiral_fundi_lexicon_loads():
     assert _LEXICON['negatives'] and _LEXICON['preambles'] and _LEXICON['leadins']
     for tool in _LEXICON['consumers']:
         assert tool in DOMAIN
+    # the longest plan the data can produce must fit the decoder budget,
+    # with room for the closing EOS step -- a longer pattern group would
+    # otherwise be silently truncated at inference time
+    from spiral.core.fundi.data import dataset
+    from spiral.core.fundi.infer import PLAN_BUDGET
+    longest = max(len(d) for _, d in dataset(8000, seed=7) if d != '<nomatch>')
+    assert longest + 1 <= PLAN_BUDGET, (longest, PLAN_BUDGET)
 
 
 @pytest.mark.skipif(
@@ -75,6 +82,8 @@ def test_spiral_ai_fundi_model():
         assert chain2 == f'[fundi] add_years: {target.isoformat()}'
         # a hard negative: calendar-near wording the model cannot serve
         assert app.ai.ask('what date is my birthday', agent='guarded', profile='fundi') == '[fundi] what date is my birthday'
+        # a sign on a bare count is not language: honest echo, not a digit
+        assert app.ai.ask('today plus -2 days', agent='guarded', profile='fundi') == '[fundi] today plus -2 days'
         assert app.ai.ask('sing me a song', agent='guarded', profile='fundi') == '[fundi] sing me a song'
         days = (date(2026, 12, 24) - date.today()).days
         chained = app.ai.chat([{'role': 'user', 'content': 'count the days from today until 2026-12-24'}], agent='guarded', profile='fundi')
