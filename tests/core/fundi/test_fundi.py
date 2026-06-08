@@ -1,14 +1,13 @@
 """
-Real test cases for the Spiral ai setup.
+Real test cases for fundi, the Spiral micro language model.
 
-Verifies the project's own tools, the guarded ``fundi`` agent, and the guard
-pipeline against the real shipped configuration (the testing environment
-merges ``testing.d/ai.yaml`` over ``base.d/ai.yaml``, pointing the file tools
-below ``tmp/tests``). Run from the project root, for example with
-``pytest tests/ext/test_spiral_ai_fundi.py``.
+Verifies the project's own trained model (the lab lives in
+``spiral/core/fundi``) against the real shipped configuration, under
+the ``guarded`` agent. Train-first: until ``weights.npz`` exists the test
+skips. Run from the project root, for example with
+``pytest tests/core/test_fundi.py``.
 """
 
-import logging
 from pathlib import Path
 
 import pytest
@@ -31,11 +30,11 @@ class SpiralAiTestApp(SpiralTest):
 
 
 @pytest.mark.skipif(
-    not Path('spiral/app/fundi/weights.npz').exists(),
-    reason="fundi has no trained weights yet (run 'python -m spiral.app.fundi.data')",
+    not Path('spiral/core/fundi/weights.npz').exists(),
+    reason="fundi has no trained weights yet (run 'python -m spiral.core.fundi.train')",
 )
 def test_spiral_ai_fundi_model():
-    # the project's own trained micro language model (spiral/app/fundi)
+    # the project's own trained micro language model (spiral/core/fundi)
     # plans with learned weights: exact copies, real chains incl. the
     # today-bridge, honest nomatch -- and the guards still rule the loop
     from datetime import date
