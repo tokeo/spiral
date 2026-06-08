@@ -59,7 +59,8 @@ per tool in English and German, nested compositions, time words
 front of the plan, distractor preambles and polite lead-ins (also in front
 of negatives, so chatter never becomes a positive signal by itself), and
 out-of-domain negatives that map to `<nomatch>` -- the anti-hallucination
-training. A fixed seed makes the dataset reproducible at any time; run
+training. Day offsets are signed: plus/after/in wordings map to positive
+day values, minus/before/ago (minus/vor in German) to negative ones. A fixed seed makes the dataset reproducible at any time; run
 `python -m spiral.core.fundi.data` to print samples.
 
 ### `train.py` -- the training tool (the only torch in the project)
@@ -73,6 +74,21 @@ the plan side. AdamW with a one-cycle schedule, environment knobs
 via `FUNDI_CKPT`/`FUNDI_CHUNK`. At the end it evaluates exact-plan accuracy
 on held-out examples and saves `weights.npz`. Torch is a dev-side tool only;
 the application never imports it.
+
+The `--no-minus` switch is a built-in ablation experiment:
+
+    python -m spiral.core.fundi.train             # with minus teaching
+    python -m spiral.core.fundi.train --no-minus  # without
+
+Both runs share the architecture, the budget, and the schedule -- only the
+dataset differs: with the switch, every signed-offset wording is left out,
+and the resulting model has no notion of minus days (a request like
+*"today minus 2 days"* falls back to the nearest learned pattern). Training
+two weights files this way makes the central lesson of the lab tangible:
+capability lives in the data, not in the code. The choice is recorded in
+the exported metadata (`minus: true/false`), so a weights file always tells
+what it was taught; the sample printer takes the same switch
+(`python -m spiral.core.fundi.data --no-minus`).
 
 ### `infer.py` -- the runtime (plain NumPy)
 
