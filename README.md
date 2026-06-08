@@ -23,6 +23,11 @@ Whether you're evaluating Tokeo for your next project or simply curious about mo
 Spiral offers an immersive test flight that demonstrates the power and elegance of event-driven systems
 without the setup overhead.
 
+Spiral is also where Tokeo's governed AI runtime comes alive: it ships **fundi**, a train-first micro
+language model (378,240 parameters, ~1.5 MB) that plans calendar tool calls through the same guarded
+agent pipeline as any large provider. No weights are shipped -- you train them yourself on CPU in
+minutes, then ask in English or German and watch every tool call pass validate, policy, and audit.
+
 ### Run the full working Spiral example
 
 ```bash
@@ -53,6 +58,8 @@ Tom
 Tokeo is a robust CLI framework for task automation, message queues, and web interfaces, making it ideal for Python backend projects. Key features include:
 
 - **Integrated EDA Stack**: Combines Dramatiq, RabbitMQ, and gRPC for efficient task processing and external access, plus APScheduler for scheduled jobs.
+- **Governed AI Agents**: A provider-agnostic AI runtime (`tokeo.ext.ai`) with typed contracts, profiles, and agents as plain configuration -- every tool call passes a guard pipeline (validate, policy, audit) and leaves a full trace. Spiral ships `fundi`, a trainable micro model, to prove it end to end.
+- **Encrypted Secrets in Config**: The vault extension (`tokeo.ext.vault`) keeps credentials encrypted inside your YAML (`!vault:<profile>` tags, built-in `enc` and `scrypt` handlers, keys from the environment) and decrypts them transparently at the leaf -- consumer code never changes, plaintext never lands in the config.
 - **Flexible Task Automation**: Use Fabric-based tools (`tokeo.ext.automate`) to define and run local or remote tasks, with flexible configuration via YAML and CLI overrides.
 - **Extensible CLI**: Built on Cement, Tokeo supports custom commands and plugins, simplifying complex workflows with minimal setup.
 - **Developer-Friendly Tools**: The `Makefile` provides one-liners for formatting (`fmt`), linting (`lint`), testing (`test`), and packaging (`sdist`, `wheel`), speeding up development.
@@ -78,7 +85,7 @@ Congratulations on creating your **Spiral** project! This is more than just code
 
 Your application is ready for you to explore and expand. Here are some exciting directions you might take:
 
-- **AI Integration**: Add intelligence with machine learning using scikit-learn, PyTorch, or integrate with LLMs
+- **Agentic AI**: Built in and governed, ask via `spiral ai ask`, every tool call passes validate, policy and audit. Trained own micro model in `core/fundi`.
 - **Data Exploration**: Uncover insights by analyzing data with pandas, matplotlib, or seaborn
 - **Web Interfaces**: Create beautiful dashboard and web tools with the built-in NiceGUI extension and tailwindcss based admin theme
 - **Automation**: Schedule tasks and create workflows with the scheduler extension or total local and remote automation
@@ -192,6 +199,32 @@ spiral cache set counter --value 1 --value-type int
 spiral cache get counter
 ```
 
+### Ask an AI Agent
+
+Your application speaks to AI providers through one governed runtime -- **the model plans, the pipeline governs, the tools compute**. Profiles and agents are plain YAML in `config/`: `audited` records everything and forbids nothing, `guarded` adds validation and policy. The tools are your own plain functions in `spiral/core/ai/tools/`, activated in groups per profile.
+
+```bash
+# The mock provider answers without any external service
+spiral ai ask "ping"
+
+# Inspect agents, profiles, and registered tools
+spiral ai list
+```
+
+Your project also ships **fundi**, a train-first micro LLM (378,240 parameters, ~1.5 MB) that plans calendar tool calls. No weights are included -- you create them, and that is the point:
+
+```bash
+# Train on your machine (CPU is fine)
+python -m spiral.core.fundi.train
+
+# Then ask, in English or German -- guarded, traced, deterministic
+spiral ai ask "the weekday of today plus 2 days" --profile fundi --agent guarded
+spiral ai ask "welches datum ist übermorgen" --profile fundi
+```
+
+The model's whole language lives in `spiral/core/fundi/FUNDI-LEX.yaml`: teach it new words and sentence patterns by editing the file and retraining. `FUNDI-LLM.md` next to it explains training, the anatomy of the weights, and grammar-constrained decoding with detailed diagrams.
+
+
 <br/>
 
 ## 📊 Development Tools
@@ -259,12 +292,14 @@ CEMENT_LOG=1 spiral command
 Your project is organized into a clean, modular structure:
 
 - `config/` - Configuration files for prod, stage, dev and test environments
-- `spiral/controllers/` - Command-line interface controllers
 - `spiral/core/logic` - Space for your core application logic
-- `spiral/core/grpc/` - gRPC service definitions and implementations
-- `spiral/site/` - Web interface pages and apis
 - `spiral/core/tasks/` - Implementations of actors, agents, automations, operations, performers etc.
+- `spiral/core/ai/` - Your AI providers and plain-function tools behind the guarded contracts
+- `spiral/core/fundi/` - The train-first micro LLM lab: model, lexicon (`FUNDI-LEX.yaml`), teaching docs
+- `spiral/core/grpc/` - gRPC service definitions and implementations
 - `spiral/core/utils/` - A place to put your overall tools and helper functions
+- `spiral/controllers/` - Command-line interface controllers
+- `spiral/site/` - Web interface pages and apis
 - `spiral/templates/` - Templates for rendering content
 - `tests/` - Test suite to ensure reliability
 
@@ -277,6 +312,7 @@ This is just the beginning of your journey. As you build and shape this project,
 - What problem are you trying to solve?
 - Who will use your application and how?
 - How can you make it not just functional, but delightful to use?
+- Which routine work could a governed agent take over and which tools would you trust it with?
 
 <br/>
 
