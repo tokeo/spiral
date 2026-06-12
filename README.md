@@ -58,15 +58,15 @@ Tom
 Tokeo is a robust CLI framework for task automation, message queues, and web interfaces, making it ideal for Python backend projects. Key features include:
 
 - **Integrated EDA Stack**: Combines Dramatiq, RabbitMQ, and gRPC for efficient task processing and external access, plus APScheduler for scheduled jobs.
-- **Governed AI Agents**: A provider-agnostic AI runtime (`tokeo.ext.ai`) with typed contracts, profiles, and agents as plain configuration -- every tool call passes a guard pipeline (validate, policy, audit) and leaves a full trace. Spiral ships `akili`, a trainable micro model, to prove it end to end.
-- **Encrypted Secrets in Config**: The vault extension (`tokeo.ext.vault`) keeps credentials encrypted inside your YAML (`!vault:<profile>` tags, built-in `enc` and `scrypt` handlers, keys from the environment) and decrypts them transparently at the leaf -- consumer code never changes, plaintext never lands in the config.
-- **Flexible Task Automation**: Use Fabric-based tools (`tokeo.ext.automate`) to define and run local or remote tasks, with flexible configuration via YAML and CLI overrides.
+- **Governed AI Agents**: A provider-agnostic AI runtime (```tokeo.ext.ai```) with typed contracts, profiles, and agents as plain configuration -- every tool call passes a guard pipeline (validate, policy, audit) and leaves a full trace. Spiral ships ```akili```, a trainable micro model, to prove it end to end.
+- **Encrypted Secrets in Config**: The vault extension (```tokeo.ext.vault```) keeps credentials encrypted inside your YAML (```!vault:<profile>``` tags, built-in ```enc``` and ```scrypt``` handlers, keys from the environment) and decrypts them transparently at the leaf -- consumer code never changes, plaintext never lands in the config.
+- **Flexible Task Automation**: Use Fabric-based tools (```tokeo.ext.automate```) to define and run local or remote tasks, with flexible configuration via YAML and CLI overrides.
 - **Extensible CLI**: Built on Cement, Tokeo supports custom commands and plugins, simplifying complex workflows with minimal setup.
-- **Developer-Friendly Tools**: The `Makefile` provides one-liners for formatting (`fmt`), linting (`lint`), testing (`test`), and packaging (`sdist`, `wheel`), speeding up development.
-- **DiskCache** by `tokeo.ext.diskcache` enhances performance with disk-based caching for frequently accessed data, reducing load times and improving efficiency.
-- **Manage task execution rates** using `temper` and `throttle` to prevent overloading with rate-limiting tools, ensuring stable and controlled processing.
+- **Developer-Friendly Tools**: The ```Makefile``` provides one-liners for formatting (```fmt```), linting (```lint```), testing (```test```), and packaging (```sdist```, ```wheel```), speeding up development.
+- **DiskCache** by ```tokeo.ext.diskcache``` enhances performance with disk-based caching for frequently accessed data, reducing load times and improving efficiency.
+- **Manage task execution rates** using ```temper``` and ```throttle``` to prevent overloading with rate-limiting tools, ensuring stable and controlled processing.
 - **SMTP with Jinja2 Templates**: Send emails with precise, individualized content using Jinja2 templates, supporting text, HTML, inline images, and attachments for dynamic communications.
-- **Simple debugging** when using `app.inspect`. Provides basic debugging tools to inspect application state of vars and objects.
+- **Simple debugging** when using ```app.inspect```. Provides basic debugging tools to inspect application state of vars and objects.
 - **Web Interface**: Create beautiful UIs with the built-in NiceGUI extension to visualize data and interact with your application.
 
 Whether you're building microservices, automating workflows, or prototyping, Tokeo provides the structure and flexibility to get started quickly.
@@ -85,7 +85,7 @@ Congratulations on creating your **Spiral** project! This is more than just code
 
 Your application is ready for you to explore and expand. Here are some exciting directions you might take:
 
-- **Agentic AI**: Built in and governed, ask via `spiral ai ask`, every tool call passes validate, policy and audit. Trained own micro model in `core/akili`.
+- **Agentic AI**: Built in and governed, ask via ```spiral ai ask```, every tool call passes validate, policy and audit. Trained own micro model in ```core/akili```.
 - **Data Exploration**: Uncover insights by analyzing data with pandas, matplotlib, or seaborn
 - **Web Interfaces**: Create beautiful dashboard and web tools with the built-in NiceGUI extension and tailwindcss based admin theme
 - **Automation**: Schedule tasks and create workflows with the scheduler extension or total local and remote automation
@@ -201,7 +201,7 @@ spiral cache get counter
 
 ### Ask an AI Agent
 
-Your application speaks to AI providers through one governed runtime -- **the model plans, the pipeline governs, the tools compute**. Profiles and agents are plain YAML in `config/`: `audited` records everything and forbids nothing, `guarded` adds validation and policy. The tools are your own plain functions in `spiral/core/ai/tools/`, activated in groups per profile.
+Your application speaks to AI providers through one governed runtime -- **the model plans, the pipeline governs, the tools compute**. Profiles and agents are plain YAML in ```config/```: ```audited``` records everything and forbids nothing, ```guarded``` adds validation and policy. The tools are your own plain functions in ```spiral/core/ai/tools/```, activated in groups per profile.
 
 ```bash
 # The mock provider answers without any external service
@@ -222,7 +222,7 @@ spiral ai ask "the weekday of today plus 2 days" --profile akili --agent guarded
 spiral ai ask "welches datum ist übermorgen" --profile akili
 ```
 
-The model's whole language lives in `spiral/core/akili/AKILI-LEX.yaml`: teach it new words and sentence patterns by editing the file and retraining. `AKILI-LLM.md` next to it explains training, the anatomy of the weights, and grammar-constrained decoding with detailed diagrams.
+The model's whole language lives in ```spiral/core/akili/AKILI-LEX.yaml```: teach it new words and sentence patterns by editing the file and retraining. ```AKILI-LLM.md``` next to it explains training, the anatomy of the weights, and grammar-constrained decoding with detailed diagrams.
 
 
 <br/>
@@ -291,17 +291,17 @@ CEMENT_LOG=1 spiral command
 
 Your project is organized into a clean, modular structure:
 
-- `config/` - Configuration files for prod, stage, dev and test environments
-- `spiral/core/logic` - Space for your core application logic
-- `spiral/core/tasks/` - Implementations of actors, agents, automations, operations, performers etc.
-- `spiral/core/ai/` - Your AI providers and plain-function tools behind the guarded contracts
-- `spiral/core/akili/` - The train-first micro LLM lab: model, lexicon (`AKILI-LEX.yaml`), teaching docs
-- `spiral/core/grpc/` - gRPC service definitions and implementations
-- `spiral/core/utils/` - A place to put your overall tools and helper functions
-- `spiral/controllers/` - Command-line interface controllers
-- `spiral/site/` - Web interface pages and apis
-- `spiral/templates/` - Templates for rendering content
-- `tests/` - Test suite to ensure reliability
+- ```config/``` - Configuration files for prod, stage, dev and test environments
+- ```spiral/core/logic``` - Space for your core application logic
+- ```spiral/core/tasks/``` - Implementations of actors, agents, automations, operations, performers etc.
+- ```spiral/core/ai/``` - Your AI providers and plain-function tools behind the guarded contracts
+- ```spiral/core/akili/``` - The train-first micro LLM lab: model, lexicon (```AKILI-LEX.yaml```), teaching docs
+- ```spiral/core/grpc/``` - gRPC service definitions and implementations
+- ```spiral/core/utils/``` - A place to put your overall tools and helper functions
+- ```spiral/controllers/``` - Command-line interface controllers
+- ```spiral/site/``` - Web interface pages and apis
+- ```spiral/templates/``` - Templates for rendering content
+- ```tests/``` - Test suite to ensure reliability
 
 <br/>
 
@@ -323,7 +323,7 @@ Keep your project healthy with these practices:
 - Document your code and add examples
 - Write tests for new features
 - Refactor when needed for clarity
-- Stay up-to-date with your packages using `make outdated`
+- Stay up-to-date with your packages using ```make outdated```
 
 <br/>
 

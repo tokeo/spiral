@@ -1,11 +1,11 @@
 """
 Real test cases for the Spiral ai setup.
 
-Verifies the project's own tools, the ``guarded`` agent, and the guard
+Verifies the project's own tools, the ```guarded``` agent, and the guard
 pipeline against the real shipped configuration (the testing environment
-merges ``testing.d/ai.yaml`` over ``base.d/ai.yaml``, pointing the file tools
-below ``tmp/tests``). Run from the project root, for example with
-``pytest tests/ext/ai/test_spiral_ai.py``.
+merges ```testing.d/ai.yaml``` over ```base.d/ai.yaml```, pointing the file tools
+below ```tmp/tests```). Run from the project root, for example with
+```pytest tests/ext/ai/test_spiral_ai.py```.
 """
 
 import logging
@@ -62,12 +62,12 @@ def test_spiral_ai_tools_exec(scratch):
     # strictly below their configured base directory
     with SpiralAiTestApp() as app:
         assert app.ai._tool('calc').exec(input='2 + 3') == '5'
-        assert len(app.ai._tool('current').exec()) == 19   # YYYY-mm-dd HH:MM:SS
+        assert len(app.ai._tool('current').exec()) == 19  # YYYY-mm-dd HH:MM:SS
         assert app.ai._tool('read_file').exec(path='sample.txt') == 'buy milk\n'
         assert app.ai._tool('append_file').exec(text='hello') == "appended to 'notes.txt'"
-        assert app.ai._tool('add_months').exec(date='2026-01-31', months=1) == '2026-02-28'   # day clamps
+        assert app.ai._tool('add_months').exec(date='2026-01-31', months=1) == '2026-02-28'  # day clamps
         assert app.ai._tool('add_months').exec(date='2026-06-08', months=-4) == '2026-02-08'
-        assert app.ai._tool('add_years').exec(date='2024-02-29', years=1) == '2025-02-28'     # leap clamps
+        assert app.ai._tool('add_years').exec(date='2024-02-29', years=1) == '2025-02-28'  # leap clamps
         assert (scratch / 'notes.txt').read_text() == 'hello\n'
         with pytest.raises(TokeoAiError, match='escapes the tool base directory'):
             app.ai._tool('read_file').exec(path='../../setup.py')
