@@ -45,6 +45,7 @@ dependencies = [
     "numpy",
     "numba",
     "torch",
+    "wasmtime",
 ]
 
 [project.optional-dependencies]
