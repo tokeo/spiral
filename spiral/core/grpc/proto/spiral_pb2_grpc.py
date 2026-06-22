@@ -6,7 +6,7 @@ import warnings
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from spiral.core.grpc.proto import spiral_pb2 as spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2
 
-GRPC_GENERATED_VERSION = '1.71.0'
+GRPC_GENERATED_VERSION = '1.81.1'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -20,14 +20,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in spiral/core/grpc/proto/spiral_pb2_grpc.py depends on'
+        + ' but the generated code in spiral/core/grpc/proto/spiral_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class SpiralStub(object):
+class SpiralStub:
     """The grpc service on Tokeo"""
 
     def __init__(self, channel):
@@ -36,6 +36,12 @@ class SpiralStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.Ping = channel.unary_unary(
+            '/spiral.Spiral/Ping',
+            request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            response_deserializer=spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2.PingResponse.FromString,
+            _registered_method=True,
+        )
         self.CountWords = channel.unary_unary(
             '/spiral.Spiral/CountWords',
             request_serializer=spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2.CountWordsRequest.SerializeToString,
@@ -44,11 +50,17 @@ class SpiralStub(object):
         )
 
 
-class SpiralServicer(object):
+class SpiralServicer:
     """The grpc service on Tokeo"""
 
+    def Ping(self, request, context):
+        """Lightweight liveness probe. Returns 'pong' immediately"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def CountWords(self, request, context):
-        """Sends a greeting"""
+        """Sends a job to CountWords in dramatiq queue"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -56,6 +68,11 @@ class SpiralServicer(object):
 
 def add_SpiralServicer_to_server(servicer, server):
     rpc_method_handlers = {
+        'Ping': grpc.unary_unary_rpc_method_handler(
+            servicer.Ping,
+            request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            response_serializer=spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2.PingResponse.SerializeToString,
+        ),
         'CountWords': grpc.unary_unary_rpc_method_handler(
             servicer.CountWords,
             request_deserializer=spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2.CountWordsRequest.FromString,
@@ -68,8 +85,38 @@ def add_SpiralServicer_to_server(servicer, server):
 
 
 # This class is part of an EXPERIMENTAL API.
-class Spiral(object):
+class Spiral:
     """The grpc service on Tokeo"""
+
+    @staticmethod
+    def Ping(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/spiral.Spiral/Ping',
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            spiral_dot_core_dot_grpc_dot_proto_dot_spiral__pb2.PingResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
 
     @staticmethod
     def CountWords(

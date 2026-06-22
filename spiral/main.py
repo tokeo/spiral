@@ -8,10 +8,12 @@ extensible CLI application with support for various extensions and handlers.
 """
 
 import os
+import sys
 import tokeo.core.utils.strict  # noqa: F401
 from cement import App, TestApp
 from cement.utils import fs
 from cement.core.exc import CaughtSignal
+from tokeo.core.exc import TokeoError
 from .core.exc import SpiralError
 from .controllers.base import BaseController
 from .controllers.emit import EmitController
@@ -27,7 +29,7 @@ class Spiral(App):
     Cement framework for command-line parsing, configuration management,
     logging, and more.
 
-    ### Notes:
+    ### Notes
 
     - The application includes several extensions by default:
         colorlog, generate, pdoc, print, jinja2, yaml and others
@@ -61,6 +63,7 @@ class Spiral(App):
             'tokeo.ext.jinja2',
             'tokeo.ext.appshare',
             'tokeo.ext.smtp',
+            'tokeo.ext.vault',
             'tokeo.ext.diskcache',
             'tokeo.ext.dramatiq',
             'tokeo.ext.grpc',
@@ -68,6 +71,7 @@ class Spiral(App):
             'tokeo.ext.nicegui',
             'tokeo.ext.pocketbase',
             'tokeo.ext.automate',
+            'tokeo.ext.ai',
         ]
 
         # register handlers
@@ -93,11 +97,11 @@ class SpiralTest(TestApp, Spiral):
     for Spiral applications. It modifies various settings to be more
     suitable for automated testing.
 
-    ### Usage:
+    ### Usage
 
     ```python
     # Basic test setup
-    from .main import SpiralTest
+    from spiral.main import SpiralTest
 
     with SpiralTest() as app:
         app.run()
@@ -105,7 +109,7 @@ class SpiralTest(TestApp, Spiral):
 
     ```
 
-    ### Notes:
+    ### Notes
 
     - Uses standard logging instead of colorlog for cleaner test output
     - Includes a smaller set of extensions to reduce test complexity
@@ -127,13 +131,13 @@ def dramatiq():
     It sets up the necessary environment without running the full
     CLI application stack.
 
-    ### Used by Spiral CLI for the dramatiq workers:
+    ### Used by Spiral CLI for the dramatiq workers
 
     ```bash
     spiral dramatiq serve
     ```
 
-    ### Notes:
+    ### Notes
 
     - Initializes the application without command processing
     - Disables signal handling as Dramatiq manages its own signals
@@ -159,11 +163,11 @@ def main():
     the primary entry point when running Spiral as
     a command-line application.
 
-    ### Returns:
+    ### Returns
 
     - **int**: Exit code indicating success (0) or failure (non-zero)
 
-    ### Raises:
+    ### Raises
 
     - **AssertionError**: When an assertion fails during application execution
     - **SpiralError**: When a Spiral-specific
@@ -171,37 +175,45 @@ def main():
     - **CaughtSignal**: When a signal (e.g., SIGINT, SIGTERM) is caught
 
     """
-    with Spiral() as app:
-        try:
+    app = None
+    try:
+        app = Spiral()
+        with app:
             app.run()
 
-        except AssertionError as e:
-            print(f'AssertionError > {e.args[0]}')
+    except (TokeoError, SpiralError, AssertionError) as e:
+        # a clean message for any error from setup or run; app is already bound,
+        # so the application logger is used when it is available
+        if app and app.log and app.log.error:
+            app.log.error(f'{type(e).__name__}:')
+            app.log.error(e.args[0] if e.args else str(e))
+        else:
+            print(f'{type(e).__name__}:')
+            print(e.args[0] if e.args else str(e))
+
+        if app:
             app.exit_code = 1
 
-            if app.debug is True:
-                import traceback
+        if app and app.debug is True:
+            import traceback
 
-                traceback.print_exc()
+            traceback.print_exc()
 
-        except SpiralError as e:
-            print(f'SpiralError > {e.args[0]}')
-            app.exit_code = 1
+    except CaughtSignal as e:
+        # Default Cement signals are SIGINT and SIGTERM, exit 0 (non-error)
+        if e.signum == 2:
+            print('\nstopped by Ctrl-C')
+        elif e.signum == 15:
+            print('\nterminated by SIGTERM')
+        else:
+            print(f'\n{e}')
 
-            if app.debug is True:
-                import traceback
-
-                traceback.print_exc()
-
-        except CaughtSignal as e:
-            # Default Cement signals are SIGINT and SIGTERM, exit 0 (non-error)
-            if e.signum == 2:
-                print('\nstopped by Ctrl-C')
-            elif e.signum == 15:
-                print('\nterminated by SIGTERM')
-            else:
-                print(f'\n{e}')
+        if app:
             app.exit_code = 0
+
+    # exit_on_close ends the process when the ```with``` exits normally; if setup
+    # or run raised, the error was handled above and the code is applied here
+    sys.exit(app.exit_code if app else 9)
 
 
 if __name__ == '__main__':

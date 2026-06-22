@@ -6,15 +6,15 @@ that are triggered by timers in Tokeo and Cement applications. Agents act as ent
 points for timed operations, often delegating actual processing to asynchronous
 workers for complex tasks.
 
-### Features:
+### Features
 
-- **Scheduled task execution** using cron-style expressions
-- **Timer-based operations** with configurable jitter and delay
-- **Centralized agent definitions** for maintainable code organization
-- **Integration with application context** via app-specific business logic
-- **Delegation to asynchronous workers** for complex processing
+- Schedules task execution with cron-style expressions
+- Runs timer-based operations with configurable jitter and delay
+- Keeps agent definitions in one place for maintainable organization
+- Calls app-specific business logic through the application context
+- Delegates complex processing to asynchronous workers
 
-### Usage:
+### Usage
 
 Define timer agents as simple Python functions:
 
@@ -47,7 +47,7 @@ scheduler:
         report_type: 'detailed'
 ```
 
-### Notes:
+### Notes
 
 - Agent functions are fired by the scheduler based on their cron expressions
 - For complex or long-running tasks, agents should delegate to async workers
@@ -67,7 +67,7 @@ def count_words_timer(url=''):
     This example agent delegates the actual word counting to an asynchronous
     worker using Dramatiq.
 
-    ### Args:
+    ### Args
 
     - **url** (str, optional): URL of the webpage to analyze.
         Argument is defined in config files.
