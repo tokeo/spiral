@@ -9,16 +9,42 @@ below ```tmp/tests```). Run from the project root, for example with
 """
 
 import logging
+import calendar
 from pathlib import Path
+from datetime import datetime as datetime_type
 
 import pytest
-from tokeo.core.ai import Invocation, ToolResult, ChatResult, ChatMessage, TraceStep, TokeoAiError
+from tokeo.core.ai import Invocation, ChatResult, ChatMessage, TraceStep, TokeoAiError
+from tokeo.core.ai.tool import create_tool_result
 from tokeo.core.ai.linter import TokeoAiLinter
 from tokeo.core.ai.guards.validate import TokeoAiToolSchemaValidator
 from tokeo.core.ai.guards.redact import TokeoAiRegexRedactGuard, TokeoAiRedactGuardError
+from tokeo.core.utils.date import to_utc, to_utc_datestring
 from spiral.core.ai.guards.truncate import SpiralAiTruncateGuard
 from spiral.core.ai.tools.calc import TokeoAiCalcTool
 from spiral.main import SpiralTest
+
+
+def _shift_months(date, months):
+    # mirror the add_months tool: normalize through the SAME to_utc the tool
+    # uses (so the day matches in any timezone), then step the calendar month
+    # and clamp the day -- this is the expected value, not a hard-coded date
+    d = to_utc(date, auto_type=True)
+    base = d.date() if isinstance(d, datetime_type) else d
+    total = base.year * 12 + (base.month - 1) + int(months)
+    year, month = divmod(total, 12)
+    month += 1
+    day = min(base.day, calendar.monthrange(year, month)[1])
+    return to_utc_datestring(d.replace(year=year, month=month, day=day))
+
+
+def _shift_years(date, years):
+    # mirror the add_years tool the same way: to_utc first, then the year step
+    d = to_utc(date, auto_type=True)
+    base = d.date() if isinstance(d, datetime_type) else d
+    year = base.year + int(years)
+    day = min(base.day, calendar.monthrange(year, base.month)[1])
+    return to_utc_datestring(d.replace(year=year, day=day))
 
 
 class SpiralAiTestApp(SpiralTest):
@@ -61,13 +87,20 @@ def test_spiral_ai_tools_exec(scratch):
     # the project tools work when called directly, and the file tools stay
     # strictly below their configured base directory
     with SpiralAiTestApp() as app:
-        assert app.ai._tool('calc').exec(input='2 + 3') == '5'
-        assert len(app.ai._tool('current').exec()) == 19  # YYYY-mm-dd HH:MM:SS
+        # calc and read_file hand back a raw value; the date tools and the file
+        # writer hand back a ToolResult whose as_str the model would see, so the
+        # test reads each according to what the tool returns
+        assert app.ai._tool('calc').exec(input='2 + 3') == 5
+        assert len(app.ai._tool('current').exec().value.as_str) == 24  # YYYY-mm-dd HH:MM:SS.MMMZ
         assert app.ai._tool('read_file').exec(path='sample.txt') == 'buy milk\n'
-        assert app.ai._tool('append_file').exec(text='hello') == "appended to 'notes.txt'"
-        assert app.ai._tool('add_months').exec(date='2026-01-31', months=1) == '2026-02-28'  # day clamps
-        assert app.ai._tool('add_months').exec(date='2026-06-08', months=-4) == '2026-02-08'
-        assert app.ai._tool('add_years').exec(date='2024-02-29', years=1) == '2025-02-28'  # leap clamps
+        appended = app.ai._tool('append_file').exec(text='hello')
+        assert appended.value.as_str == 'true' and appended.value.as_data['file'] == 'notes.txt'
+        # the date tools normalize their input through to_utc, which can shift
+        # the day east of UTC; the expected values mirror that same to_utc so the
+        # assertions hold in any timezone rather than against a hard-coded day
+        assert app.ai._tool('add_months').exec(date='2026-01-31', months=1).value.as_str == _shift_months('2026-01-31', 1)
+        assert app.ai._tool('add_months').exec(date='2026-06-08', months=-4).value.as_str == _shift_months('2026-06-08', -4)
+        assert app.ai._tool('add_years').exec(date='2024-02-29', years=1).value.as_str == _shift_years('2024-02-29', 1)
         assert (scratch / 'notes.txt').read_text() == 'hello\n'
         with pytest.raises(TokeoAiError, match='escapes the tool base directory'):
             app.ai._tool('read_file').exec(path='../../setup.py')
@@ -188,10 +221,10 @@ def test_spiral_ai_redact_guard_masks_secrets():
         guard._setup(app)
         # on_return: a secret in the returned text is masked
         invocation = Invocation(id='t1', name='read_file', arguments={})
-        invocation.result = ToolResult(text='the page said Bearer abc123DEF456ghi789 here')
+        invocation.result = create_tool_result('the page said Bearer abc123DEF456ghi789 here')
         guard.on_return(None, invocation)
-        assert 'abc123DEF456ghi789' not in invocation.result.text
-        assert '[redacted]' in invocation.result.text
+        assert 'abc123DEF456ghi789' not in invocation.result.value.as_str
+        assert '[redacted]' in invocation.result.value.as_str
         assert 'redacted' in (invocation.reason or '')
         assert invocation.decision == 'allow'
         # on_call: a secret in a string argument is masked in place
@@ -213,7 +246,7 @@ def test_spiral_ai_redact_guard_raises_on_missing_pattern():
         guard = TokeoAiRegexRedactGuard(app)
         guard._setup(app)
         invocation = Invocation(id='t1', name='read_file', arguments={})
-        invocation.result = ToolResult(text='Bearer abc123DEF456ghi789')
+        invocation.result = create_tool_result('Bearer abc123DEF456ghi789')
         with pytest.raises(TokeoAiRedactGuardError, match='missing or invalid pattern'):
             guard.on_return(None, invocation)
 
@@ -227,9 +260,9 @@ def test_spiral_ai_truncate_guard_caps_long_results():
         guard._declaration = dict(options=dict(limit=10))
         # on_return caps the tool result text and notes the cut on reason
         invocation = Invocation(id='t1', name='read_file', arguments={})
-        invocation.result = ToolResult(text='x' * 50)
+        invocation.result = create_tool_result('x' * 50)
         guard.on_return(None, invocation)
-        assert invocation.result.text == 'x' * 10 + '... [truncated 40 chars]'
+        assert invocation.result.value.as_str == 'x' * 10 + '... [truncated 40 chars]'
         assert 'truncated 40 chars' in (invocation.reason or '')
         # on_close caps the run's final answer text
         result = ChatResult(text='y' * 50)

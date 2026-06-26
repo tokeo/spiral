@@ -14,7 +14,6 @@ import os
 
 import pytest
 from cement.utils.misc import init_defaults
-from tokeo.core.ai import ToolResult, TokeoAiError
 from tokeo.core.ai.tools.python_untrusted_exec import TokeoAiPythonUntrustedExecTool
 from tokeo.core.ai.tools.python_trusted_exec import TokeoAiPythonTrustedExecTool
 from spiral.main import SpiralTest
@@ -44,16 +43,15 @@ def test_spiral_wasm_memory_cap_is_hard():
 
 
 def test_spiral_untrusted_exec_runs_in_process():
-    # the tool logic (compile/exec, result -> text) is sandbox-agnostic
+    # the tool returns the snippet's raw value now -- the sandbox layer wraps it
+    # into a ToolResult, so exec itself is sandbox-agnostic and value-only
     tool = TokeoAiPythonUntrustedExecTool(None)
-    result = tool.exec(code='result = sum(range(10))')
-    assert result.text == '45' and result.data == 45
+    assert tool.exec(code='sum(range(10))') == 45
 
 
 def test_spiral_trusted_exec_runs_in_process():
     tool = TokeoAiPythonTrustedExecTool(None)
-    result = tool.exec(code='result = 6 * 7')
-    assert result.text == '42'
+    assert tool.exec(code='6 * 7') == 42
 
 
 # --------------------------------------------------------------------------------------
@@ -177,10 +175,11 @@ def test_spiral_untrusted_exec_in_wasm_guest():
         agent = app.ai._agent('untrusted_coder')
         out = app.ai._exec_in_sandbox(
             'run_untrusted',
-            dict(code='import statistics\nresult = statistics.median([5, 1, 9, 3, 7])'),
+            dict(code='import statistics\nstatistics.median([5, 1, 9, 3, 7])'),
             agent,
         )
-        text = out.text if isinstance(out, ToolResult) else str(out)
+        # value is None when the tool returned nothing, so guard the access
+        text = out.value.as_str if out.value else ''
         assert text == '5'
 
 
@@ -195,10 +194,11 @@ def test_spiral_trusted_exec_in_wasm_guest():
         agent = app.ai._agent('trusted_coder')
         out = app.ai._exec_in_sandbox(
             'run_trusted',
-            dict(code='import spiral\nresult = bool(spiral.__name__)'),
+            dict(code='import spiral\nbool(spiral.__name__)'),
             agent,
         )
-        text = out.text if isinstance(out, ToolResult) else str(out)
+        # value is None when the tool returned nothing, so guard the access
+        text = out.value.as_str if out.value else ''
         assert text == 'True'
 
 
@@ -207,13 +207,15 @@ def test_spiral_trusted_exec_in_wasm_guest():
     reason=f'no wasm build at {_RUNTIME} / {_STDLIB} (override via TOKEO_TEST_PYTHON_WASM and TOKEO_TEST_WASI_STDLIB)',
 )
 def test_spiral_untrusted_guest_cannot_import_the_app():
-    # the untrusted path mounts no app: importing the project must fail in the
-    # guest, proving the framework stays invisible to untrusted code
+    # the untrusted path mounts the pact contract but no app, so importing the
+    # project fails in the guest, recorded as a tool exception on the result (A)
+    # with no value -- the app stays invisible to untrusted code
     with SpiralWasmTestApp(config_defaults=wasm_ai_config()) as app:
         agent = app.ai._agent('untrusted_coder')
-        with pytest.raises(TokeoAiError, match='ModuleNotFoundError'):
-            app.ai._exec_in_sandbox(
-                'run_untrusted',
-                dict(code='import spiral\nresult = 1'),
-                agent,
-            )
+        out = app.ai._exec_in_sandbox(
+            'run_untrusted',
+            dict(code='import spiral\n1'),
+            agent,
+        )
+        assert out.value is None
+        assert 'ModuleNotFoundError' in (out.state.exception or '')
