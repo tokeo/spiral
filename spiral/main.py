@@ -72,6 +72,7 @@ class Spiral(App):
             'tokeo.ext.pocketbase',
             'tokeo.ext.automate',
             'tokeo.ext.ai',
+            'tokeo.ext.smtpd',
         ]
 
         # register handlers
