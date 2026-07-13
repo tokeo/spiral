@@ -17,11 +17,6 @@ from spiral.core import tasks
 URL_PATTERN = re.compile(r'https?://\S+')
 
 
-def _address(data):
-    """The plain lowercase address from a MAIL FROM / RCPT TO argument."""
-    return data.strip().strip('<>').lower()
-
-
 class SpiralSmtpdEvents(TokeoSmtpdEvents):
     """
     Events handler for the mx-spiral receiving service.
