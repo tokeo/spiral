@@ -17,7 +17,7 @@ from tokeo.core.ai.tool import create_tool_result
 from tokeo.core.ai.linter import TokeoAiLinter
 from tokeo.core.ai.guards.validate import TokeoAiToolSchemaValidator
 from tokeo.core.ai.guards.redact import TokeoAiRegexRedactGuard, TokeoAiRedactGuardError
-from spiral.core.ai.guards.truncate import SpiralAiTruncateGuard
+from spiral.core.ai.transformers.truncate import SpiralAiTruncateTransformer
 from spiral.core.ai.tools.calc import TokeoAiCalcTool
 from spiral.main import SpiralTest
 
@@ -226,20 +226,20 @@ def test_spiral_ai_redact_guard_raises_on_missing_pattern():
             guard.on_return(None, invocation)
 
 
-def test_spiral_ai_truncate_guard_caps_long_results():
-    # the project truncate guard keeps the head of an over-long text and marks
-    # the cut, so a big blob cannot blow the budget. it acts at two stages:
-    # on_return (a tool result) and on_close (the final answer)
+def test_spiral_ai_truncate_transformer_caps_long_results():
+    # the project truncate transformer keeps the head of an over-long text and
+    # marks the cut, so a big blob cannot blow the budget. it acts at two
+    # stages: on_return (a tool result) and on_close (the final answer)
     with SpiralAiTestApp() as app:
-        guard = SpiralAiTruncateGuard(app)
-        guard._declaration = dict(options=dict(limit=10))
+        transformer = SpiralAiTruncateTransformer(app)
+        transformer._declaration = dict(options=dict(limit=10))
         # on_return caps the tool result text and notes the cut on reason
         invocation = Invocation(id='t1', name='read_file', arguments={})
         invocation.result = create_tool_result('x' * 50)
-        guard.on_return(None, invocation)
+        transformer.on_return(None, invocation)
         assert invocation.result.value.as_str == 'x' * 10 + '... [truncated 40 chars]'
         assert 'truncated 40 chars' in (invocation.reason or '')
         # on_close caps the run's final answer text
         result = ChatResult(text='y' * 50)
-        guard.on_close(None, result)
+        transformer.on_close(None, result)
         assert result.text == 'y' * 10 + '... [truncated 40 chars]'
