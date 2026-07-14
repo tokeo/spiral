@@ -38,12 +38,25 @@ shell block, so each one is a single copy away from your terminal.
 
 ## Before the show
 
-Train the weights once. They are a project asset (gitignored), built from
-the synthetic data in ```AKILI-LEX.yaml``` in a few minutes on a CPU:
+Three acts, one ladder -- built so that no prior knowledge is needed:
+act 1 shows the agent machinery with **no model at all** (a deterministic
+stand-in drives it, so you can start right away and watch every gear),
+act 2 puts **a real micro model you train yourself** on the same stage,
+and act 3 shows **where and why it breaks** -- on purpose, because seeing
+the edges is the lesson the big models hide.
+
+Act 1 needs no weights, so feel free to start there immediately. Before
+act 2, train the weights once. They are a project asset (gitignored),
+built from the synthetic data in ```AKILI-LEX.yaml``` in a few minutes on
+a CPU:
 
 ```shell
 python -m spiral.core.akili.train
 ```
+
+While it trains, watch what it prints: the aggregate accuracy is the
+headline, and the small table beneath it shows the accuracy **per request
+class**. Keep that table in mind -- act 3 comes back to it.
 
 Give the file tools something to read:
 
@@ -327,6 +340,86 @@ checks arguments against the schema, deny and the sandbox chain bound
 what a wrong plan can touch, ```max_loops``` stops a model stuck on
 refusals, and the trace makes every step inspectable. **The model may be
 wrong -- the architecture makes the error visible, bounded, and cheap.**
+
+### Reading the per-class table: the seam behind the average
+
+Training prints one accuracy line per request class. The aggregate can
+clear the quality bar while a single class lags behind -- and the thin
+**chain, minus explicit date** slice ("the weekday of 2026-12-24 minus
+2 days") is the canonical example: it needs a two-step plan (shift the
+date, then consume it), and it is the rarest shape in the mixture. If
+exactly such a request fails while the aggregate looks fine, you are not
+looking at a broken model -- you are looking at a thin class. The fix is
+never "more steps": it is more, or better-weighted, data for that class.
+The generator drills this seam on purpose -- the re-roll inside
+the ```_render_shift``` helper of ```data.py``` -- and the table is how
+you verify the drill worked. One reading rule: on classes with fewer
+than ~25 held-out examples read the absolute counts, not the
+percentages -- two hits move a small class by ten points.
+
+### Walking the edge: commands that just work -- and tip
+
+Everything shown so far lives in the model's strong classes. The per-class
+table has weaker ones -- and you can stand on that edge yourself. Each
+pair below starts with a request that usually lands and follows with its
+close sibling that tends to tip. Run each a few times, add ```--json``` to
+see the plan, and keep your own table next to it: your weight set differs,
+so your edge differs -- that is the point.
+
+The consumer edge -- the chain is right, the last step may swap:
+
+```shell
+spiral ai ask "weekday of 2026-06-08 plus 2 days" --profile akili
+spiral ai ask "erst 4 jahre von 2018-09-23 abziehen und dann der kalenderwoche" --profile akili
+```
+
+The daydiff edge -- three shapes of the same question, rising difficulty:
+anchored on today and a trained word, anchored on today and a literal
+date, and the hardest copy task of the domain, two literal dates:
+
+```shell
+spiral ai ask "count the days from today until tomorrow" --profile akili
+spiral ai ask "zaehle die tage zwischen heute und 2036-11-10" --profile akili
+spiral ai ask "how many days lie between 2032-02-03 and 2003-08-27" --profile akili
+```
+
+The minus edge -- the request family this whole chapter started from:
+shifting backwards from today is well practised, the same words anchored
+on a literal date sit on the thin seam:
+
+```shell
+spiral ai ask "der wochentag von heute minus 2 tagen" --profile akili
+spiral ai ask "the weekday of 2026-12-24 minus 2 days" --profile akili
+```
+
+When a pair tips for you, you are looking at the live form of the per-class table:
+a class the data drills but the model has not mastered at this size. The levers
+are the drill strengths in ```data.py``` (the re-roll inside ```_render_shift```)
+and the patterns in ```AKILI-LEX.yaml``` -- strengthen one, retrain, and watch
+both the table and your pair respond.
+
+### The ablation: training without the knowledge
+
+The strongest lesson is a model that cannot know something. Retrain with
+the ablation switch:
+
+```shell
+python -m spiral.core.akili.train --no-minus
+```
+
+Same architecture, same budget -- but every minus/ago/vor wording is left
+out of the data. Now ask:
+
+```shell
+spiral ai ask "weekday of 2026-12-24 minus 2 days" --profile akili
+```
+
+Expect it to fail: typically an honest ```<nomatch>``` or a plan without
+the backward shift -- the exact form depends on your run. The point is
+the contrast with everything above. No amount of extra steps teaches what
+the data never contained: knowledge lives in the dataset, training only
+distills it. Retrain without the flag afterwards to restore the full
+model -- the weights file is simply overwritten.
 
 ## Curtain
 
