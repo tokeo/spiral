@@ -18,9 +18,9 @@ from tokeo.core.utils.date import utc_now
 from spiral.main import SpiralTest
 
 # the held-out exact-plan accuracy the trained model must reach before the
-# per-phrasing checks are trustworthy. raised to 0.94 together with the
-# larger capacity (dim 128, ff 512); adjust after the first training run
-# of the bigger model and set it just under the achieved value
+# per-phrasing checks are trustworthy. calibrated to the measured plateau
+# of the drilled mixture (repeated runs settle at 0.93-0.95); raise it
+# again the moment a data or capacity change moves the plateau
 _MIN_ACCURACY = 0.94
 
 # english weekday names, locale-independent, matching the tool's output
@@ -209,13 +209,9 @@ def test_spiral_ai_akili_model():
         # borderline wording. retrain with more steps to lift it
         from spiral.core.akili.infer import AkiliModel
 
-        # the floor measures the product: decoding guarded by the grammar
-        # fence, exactly as infer.py runs it. the raw number stays recorded
-        # in the weights as the honest lower bound of the bare model
-        config = AkiliModel().config
-        accuracy = config.get('accuracy_constrained', config.get('accuracy', 0.0))
+        accuracy = AkiliModel().config.get('accuracy', 0.0)
         assert accuracy >= _MIN_ACCURACY, (
-            f'akili held-out fenced accuracy {accuracy:.4f} < {_MIN_ACCURACY}; '
+            f'akili held-out accuracy {accuracy:.4f} < {_MIN_ACCURACY}; '
             'retrain with more steps (e.g. AKILI_STEPS=4000 AKILI_DATA=60000)'
         )
 
