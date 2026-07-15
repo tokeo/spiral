@@ -106,7 +106,7 @@ model could never store a million date facts, but it can learn perfectly
 model does not understand becomes an honest ```<nomatch>```. It can still
 hallucinate *meaning* -- a well-formed plan for a question that was never
 asked -- typically where a request falls into the gap between the trained
-patterns and the trained refusals. ```AKILI-USE.md``` (act 3) demonstrates
+patterns and the trained refusals. ```AKILI-USE.md``` (part 3) demonstrates
 these limits on purpose, and why the fundi machinery around the model is
 there to catch them.
 
