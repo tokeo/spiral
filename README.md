@@ -343,7 +343,7 @@ The Spiral Docker image ships ```fundi``` installed, so the example runs out of 
 
 ### Akili
 
-There is an exception among the sources in ```tokeo.core.akili``` module. It is meant as a demonstration and is not intended for delivery. It ships so you can experiment and learn, and it can be removed without side effects.
+There is an exception among the sources in ```spiral.core.akili``` module. It is meant as a demonstration and is not intended for delivery. It ships so you can experiment and learn, and it can be removed without side effects.
 
 If you really have reasons to keep ```akili``` in your own project, its files must remain under the Apache License, Version 2.0. Make sure to comply with that license. Keep the file headers and the ```LICENSE.txt``` copy in the ```akili``` directory.
 
