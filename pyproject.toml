@@ -27,7 +27,7 @@ dependencies = [
     "lazy_loader",
     "prompt_toolkit",
     "diskcache",
-    "dramatiq",
+    "dramatiq>=2.0.0",
     "dramatiq[rabbitmq]",
     "pika",
     "grpcio",
@@ -62,12 +62,8 @@ dev = [
     "coverage>=7.10.0",
     "pyink>=25.0.0",
     "flake8>=7.0.0",
-    "pdoc>=15.0.0",
-    "markdown>=3.7",
     "watchdog",
     "dramatiq[watch]",
-    "watchdog_gevent",
-    "gevent",
 ]
 
 [project.scripts]

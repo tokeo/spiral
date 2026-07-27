@@ -1,4 +1,5 @@
-### <p><strong>The Spiral PDoc Configuration Settings</strong></p>
+### **The Spiral PDoc Configuration Settings**
+###
 ### - Settings will be merged into Application Configuration.
 ---
 
@@ -29,9 +30,9 @@ pdoc:
     - spiral.templates.pdoc.html
     - tokeo.templates.pdoc.html
   ### packages or directories holding external markdown snippets
-  docstrings:
-    - spiral.templates.pdoc.docstrings
-    - tokeo.templates.pdoc.docstrings
+  ### docstrings:
+  ###  - spiral.templates.pdoc.docstrings
+  ###  - tokeo.templates.pdoc.docstrings
   ### render the yaml configuration
   show_config: true
   ### how many levels of the class hierarchy above a documented class to
@@ -42,6 +43,6 @@ pdoc:
   ### glob patterns never to react to. `.*` covers hidden scratch files
   watch_excludes: '.*'
   ### seconds between two checks of the change flag
-  watch_interval: 1.0
+  watch_interval: 2.0
   ### seconds of quiet required before restarting
   watch_settle: 1.5

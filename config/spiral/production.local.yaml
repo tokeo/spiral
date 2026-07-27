@@ -1,0 +1,30 @@
+### **The Spiral Production Configuration Secrets**
+###
+### - Secrets will be merged into Application Configuration.
+### - This files should not be checked into source repos.
+---
+
+
+
+dramatiq:
+  ### connection settings for rabbitmw
+  rabbitmq:
+    ### connection url to rabbitmq server
+    url: amqp://localhost:5672/
+    ### connection username or identity for rabbitmq server
+    auth_identity: guest
+    ### connection password for rabbitmq server
+    auth_password: guest
+
+
+
+smtp:
+  ### enable authentication for service
+  auth: true
+  ### auth username or identity
+  auth_identity: production.user
+  ### auth password
+  auth_password: top.secret
+
+
+
