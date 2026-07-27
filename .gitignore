@@ -33,8 +33,6 @@
 !/spiral/**
 
 # excluded to prevent accidental distribution.
-# code in this directory and deeper is subject
-# to a commercial-restricted license, not MIT.
 /spiral/core/ai/akili
 /spiral/core/ai/akili/**
 
@@ -43,10 +41,6 @@
 
 !/tests/
 !/tests/**
-
-!/tmp/
-!/tmp/tests/
-!/tmp/tests/.gitkeep
 
 !/.python-version
 !/.gitignore
@@ -63,9 +57,12 @@
 !/setup.py
 !/pyproject.toml
 
-!/CHANGELOG.md
+!/LICENSE.txt
 !/LICENSE.md
+!/NOTICE.txt
+!/NOTICE.md
 !/README.md
+!/CHANGELOG.md
 !/TODO.md
 !/*.md
 

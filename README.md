@@ -83,7 +83,7 @@ Whether you're building microservices, automating workflows, or prototyping, Tok
 
 ### 🎯 What's Next?
 
-Your application is ready for you to explore and expand. Here are some exciting directions you might take:
+Some directions you might take from here:
 
 - **Agentic AI**: Built in and governed, ask via ```spiral ai ask```, every tool call passes validate, policy and audit. Trained own micro model in ```core/akili```.
 - **Data Exploration**: Uncover insights by analyzing data with pandas, matplotlib, or seaborn
@@ -201,7 +201,7 @@ spiral cache get counter
 
 ### Ask an AI Agent
 
-Your application speaks to AI providers through one governed runtime -- **the model plans, the pipeline governs, the tools compute**. Profiles and agents are plain YAML in ```config/```: ```audited``` records everything and forbids nothing, ```guarded``` adds validation and policy. The tools are your own plain functions in ```spiral/core/ai/tools/```, activated in groups per profile.
+Your application speaks to AI providers through one governed runtime. The model plans, the pipeline governs, the tools compute. Profiles and agents are plain YAML in ```config/```: ```audited``` records everything and forbids nothing, ```guarded``` adds validation and policy. The tools are your own plain functions in ```spiral/core/ai/tools/```, activated in groups per profile.
 
 ```bash
 # The mock provider answers without any external service
@@ -211,13 +211,13 @@ spiral ai ask "ping"
 spiral ai list
 ```
 
-Your project also ships **akili**, a train-first micro LLM (378,240 parameters, ~1.5 MB) that plans calendar tool calls. No weights are included -- you create them, and that is the point:
+Your project also ships **akili**, a train-first micro LLM (~600K parameters, ~2.5 MB) that plans calendar tool calls. No weights are included. You create them, and that is the point:
 
 ```bash
 # Train on your machine (CPU is fine)
 python -m spiral.core.akili.train
 
-# Then ask, in English or German -- guarded, traced, deterministic
+# Then ask in English or German (guarded, traced, deterministic)
 spiral ai ask "the weekday of today plus 2 days" --profile akili --agent guarded
 spiral ai ask "welches datum ist übermorgen" --profile akili
 ```
@@ -307,11 +307,11 @@ Your project is organized into a clean, modular structure:
 
 ## 🌟 Making It Your Own
 
-This is just the beginning of your journey. As you build and shape this project, consider:
+As you build and shape this project, consider:
 
 - What problem are you trying to solve?
 - Who will use your application and how?
-- How can you make it not just functional, but delightful to use?
+- How can you make it not just functional, but pleasant to use?
 - Which routine work could a governed agent take over and which tools would you trust it with?
 
 <br/>
@@ -324,6 +324,30 @@ Keep your project healthy with these practices:
 - Write tests for new features
 - Refactor when needed for clarity
 - Stay up-to-date with your packages using ```make outdated```
+
+<br/>
+
+## 📄 Licensing
+
+The generated project sources are yours. Use them freely and license them however you like. This scaffold imposes no attribution requirement and no license of its own on your code.
+
+That covers the code you take from here. It does not extend to the third-party packages a project installs — those keep their own licenses. Spiral is the showcase generated with the **full feature set**, so it contains everything the generator can produce. Two parts deserve a look before you build on them by yourself: ```fundi```, the agentic framework behind the ai feature, and ```akili```, the demo model.
+
+### Fundi
+
+```fundi``` is the agentic framework that powers the tokeo ai features: agents, tools, governors, sandboxing and audit. It is a dependency, not part of these sources, and it is **not** open source but fair source and source available. It is released under the *Tokeo-Fundi Source-Available License 1.0*.
+
+Zero-cost use is tied to fair conditions in that license, among them a revenue threshold and a headcount threshold for your organisation. Organisations that exceed the numbers need a commercial Enterprise License from the licensor before using or operating it. The license also restricts using its source code as training data for machine-learning systems. The complete and authoritative terms are in ```LICENSE.md``` of the tokeo-fundi distribution. Read them before use.
+
+The Spiral Docker image ships ```fundi``` installed, so the example runs out of the box. That is a convenience for trying things out, not a permission to run it in production: the terms above apply to whoever runs the image. The license texts of everything inside the image are collected under ```/licenses```.
+
+### Akili
+
+There is an exception among the sources in ```tokeo.core.akili``` module. It is meant as a demonstration and is not intended for delivery. It ships so you can experiment and learn, and it can be removed without side effects.
+
+If you really have reasons to keep ```akili``` in your own project, its files must remain under the Apache License, Version 2.0. Make sure to comply with that license. Keep the file headers and the ```LICENSE.txt``` copy in the ```akili``` directory.
+
+To put it another way: the purpose of ```akili``` is lab work. Use it to understand LLMs, to learn how to build one yourself, and how to equip it with tools. It is there to give you the idea and the know-how to reach your own goals efficiently. For that reason ```akili``` normally does not belong in your delivered project.
 
 <br/>
 

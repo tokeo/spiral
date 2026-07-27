@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75.0.0", "wheel"]
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,7 +10,8 @@ readme = "README.md"
 authors = [
     {name = "Tom Freudenberg", email = "th.freudenberg@gmail.com"}
 ]
-license = "MIT"
+license = "Apache-2.0"
+license-files = ["LICENSE.txt", "NOTICE.md"]
 urls = {"Homepage" = "https://github.com/tokeo/spiral/"}
 requires-python = ">=3.10"  # Adjust based on your needs
 dependencies = [
@@ -52,15 +53,17 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pip-tools>=7.0.0",
+    "build>=1.0.0",
+    "setuptools>=77.0.0",
+    "wheel>=0.40.0",
+    "twine>=6.0.0",
     "pytest>=8.5.0",
     "pytest-cov>=6.0.0",
     "coverage>=7.10.0",
-    "twine>=6.0.0",
-    "setuptools>=75.0.0",
-    "wheel>=0.40.0",
     "pyink>=25.0.0",
     "flake8>=7.0.0",
-    "pdoc3>=0.11.0",
+    "pdoc>=15.0.0",
+    "markdown>=3.7",
     "watchdog",
     "dramatiq[watch]",
     "watchdog_gevent",
@@ -75,7 +78,10 @@ packages = {find = {include = ["spiral", "spiral.*"], exclude = ["ez_setup", "te
 include-package-data = true
 
 [tool.setuptools.package-data]
-"spiral" = ["**/*.md", "templates/*", "templates/**/*", "templates/**/.*", "**/*.proto"]
+"spiral" = ["**/*.md"]
+"spiral.core.akili" = ["**/LICENSE.*", "**/NOTICE.*"]
+"spiral.core.grpc" = ["**/*.proto"]
+"spiral.templates" = ["**/*", "**/.*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "spiral.core.version.get_version"}

@@ -1,4 +1,4 @@
-.PHONY: help clean venv outdated dev prod proto doc test fmt lint docker sdist wheel dist-upload
+.PHONY: help clean venv outdated dev prod proto doc test fmt lint docker sdist wheel dist dist-upload
 
 help:
 	@echo
@@ -20,6 +20,8 @@ help:
 	@echo "  docker - create docker image"
 	@echo "  sdist - create source tgz"
 	@echo "  wheel - create installation wheel"
+	@echo "  dist - create sdist and wheel"
+	@echo "  dist-upload - upload dist/* via twine"
 	@echo
 
 clean:
@@ -147,6 +149,9 @@ sdist: clean
 
 wheel: clean
 	python -m build --wheel
+
+dist: clean
+	python -m build
 
 dist-upload:
 	twine upload dist/*

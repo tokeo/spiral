@@ -1,25 +1,23 @@
 <!--
-Copyright (c) 2026 Tom (Thomas) Freudenberg th.freudenberg@gmail.com
+Copyright 2012-2026 Tom (Thomas) Freudenberg <th.freudenberg@gmail.com>
 
-This file is part of the Tokeo-Fundi project.
+SPDX-License-Identifier: Apache-2.0
 
-The akili module is primarily a training and demonstration tool,
-intended for experimentation and the gathering of insights.
-It serves as foundational material within this context.
+The akili module is a training and demonstration tool, intended for
+experimentation and for gathering insights. It is not required by the
+generated application and should be removed without side effects.
 
-IMPORTANT: While the surrounding repository may be licensed under the
-MIT License, this specific file is governed exclusively by the
-Tokeo-Fundi Source-Available License 1.0.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Use, modification, and distribution are permitted strictly in
-accordance with the terms of this license, which includes specific
-revenue and headcount thresholds for zero-cost qualification.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-A copy of the full license is available at:
-https://github.com/tokeo/fundi/blob/master/LICENSE.md
-
-If your entity does not qualify for the zero-cost license, a separate
-commercial Enterprise License is required.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 
 # akili in use -- a guided demo in three parts

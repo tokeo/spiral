@@ -108,7 +108,7 @@ def get_openapi_custom():
         ),
         # License dict
         license_info=dict(
-            name='MIT',
+            name='Apache-2.0',
             identifier=None,
             url=None,
         ),
